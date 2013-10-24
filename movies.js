@@ -33,6 +33,19 @@ var filtersSvg = d3.select("body").append("svg")
 
 loadData(files[0]);
 
+// Dimensions for all the components in our vis
+var svgWidth = 1200;
+var svgHeight = 800;
+var bubbleChartWidth = 1000;
+var bubbleChartHeight = 300;
+var lineChartWidth = 1000;
+var lineChartHeight = 300;
+var detailsWidth = 1000;
+var detailsHeight = 200;
+var filtersWidth = 200;
+var filtersHeight = 800;
+
+
 /*
  * Prepares the data so it can be manipulated in
  * d3.js.
@@ -46,9 +59,13 @@ function loadData(filename){
             console.log(data);  //DEBUG: delete this later...        
             moviesDataset = data;
             //generateTitle();
-    		    //generateBubbleGraph();
-    		    //generateLineGraph();
-    		    //generateSidePanel();
+    		//generateBubbleGraph();
+    		//generateLineGraph();
+    		//generateSidePanel();
         }
     });	
 }
+
+/*
+ * 
+ */
