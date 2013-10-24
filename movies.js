@@ -19,24 +19,39 @@ var detailsHeight = 200;
 var filtersWidth = 200;
 var filtersHeight = 800;
 
-// svg 
-var bubbleSvg = d3.select("body").append("svg")
-					.attr("id", "bubbleChart")
-					.attr("width", bubbleChartWidth)
-					.attr("height", bubbleChartHeight);
-var detailsSvg = d3.select("body").append("svg")
-					.attr("id", "details")
-					.attr("width", detailsWidth)
-					.attr("height", detailsHeight);
-var lineSvg = d3.select("body").append("svg")
-					.attr("id", "lineChart")
-					.attr("width", lineChartWidth)
-					.attr("height", lineChartHeight);
-var filtersSvg = d3.select("body").append("svg")
-					.attr("id", "filters")
-					.attr("width", filtersWidth)
-					.attr("height", filtersHeight);
-
+// set up the svg layout 
+function setupLayout(){
+	
+	var svg = d3.select("body")
+				.append("svg")
+				.attr("width", svgWidth)
+				.attr("height", svgHeight);
+				
+	var bubbleSvg = svg.append("svg")
+						//.attr("id", "bubbleChart")
+						.attr("x", "0")
+						.attr("y", "0")
+						.attr("width", bubbleChartWidth)
+						.attr("height", bubbleChartHeight);
+	var detailsSvg = svg.append("svg")
+						//.attr("id", "details")
+						.attr("x", "0")
+						.attr("y", "bubbleChartHeight")
+						.attr("width", detailsWidth)
+						.attr("height", detailsHeight);
+	var lineSvg = svg.append("svg")
+						//.attr("id", "lineChart")
+						.attr("x", "0")
+						.attr("y", "bubbleChartHeight + detailsHeight")
+						.attr("width", lineChartWidth)
+						.attr("height", lineChartHeight);
+	var filtersSvg = svg.append("svg")
+						//.attr("id", "filters")
+						.attr("x", "bubbleChartWidth")
+						.attr("y", "0")
+						.attr("width", filtersWidth)
+						.attr("height", filtersHeight);
+}
 					
 
 
@@ -59,6 +74,7 @@ function loadData(filename){
     		//generateBubbleGraph();
     		//generateLineGraph();
     		//generateSidePanel();
+    		setupLayout();
         }
     });	
 }
