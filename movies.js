@@ -7,6 +7,30 @@ var genreDataset;
 // csv filenames 
 var files = new Array("1983-2012_movies.csv", "1983-2012_genres.csv");
 
+// dimensions
+
+
+// svg 
+var bubbleSvg = d3.select("body").append("svg")
+					.attr("id", "bubbleChart")
+					.attr("width", bubbleChartWidth)
+					.attr("height", bubbleChartHeight);
+var detailsSvg = d3.select("body").append("svg")
+					.attr("id", "details")
+					.attr("width", detailsWidth)
+					.attr("height", detailsHeight);
+var lineSvg = d3.select("body").append("svg")
+					.attr("id", "lineChart")
+					.attr("width", lineChartWidth)
+					.attr("height", lineChartHeight);
+var filtersSvg = d3.select("body").append("svg")
+					.attr("id", "filters")
+					.attr("width", filtersWidth)
+					.attr("height", filtersHeight);
+
+					
+
+
 loadData(files[0]);
 
 /*
