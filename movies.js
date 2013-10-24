@@ -7,8 +7,17 @@ var genreDataset;
 // csv filenames 
 var files = new Array("1983-2012_movies.csv", "1983-2012_genres.csv");
 
-// dimensions
-
+// Dimensions for all the components in our vis
+var svgWidth = 1200;
+var svgHeight = 800;
+var bubbleChartWidth = 1000;
+var bubbleChartHeight = 300;
+var lineChartWidth = 1000;
+var lineChartHeight = 300;
+var detailsWidth = 1000;
+var detailsHeight = 200;
+var filtersWidth = 200;
+var filtersHeight = 800;
 
 // svg 
 var bubbleSvg = d3.select("body").append("svg")
@@ -32,18 +41,6 @@ var filtersSvg = d3.select("body").append("svg")
 
 
 loadData(files[0]);
-
-// Dimensions for all the components in our vis
-var svgWidth = 1200;
-var svgHeight = 800;
-var bubbleChartWidth = 1000;
-var bubbleChartHeight = 300;
-var lineChartWidth = 1000;
-var lineChartHeight = 300;
-var detailsWidth = 1000;
-var detailsHeight = 200;
-var filtersWidth = 200;
-var filtersHeight = 800;
 
 
 /*
