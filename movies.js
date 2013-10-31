@@ -11,18 +11,25 @@ var files = new Array("1983-2012_movies.csv", "1983-2012_genres.csv");
 var svg;
 var svgWidth = 1200;
 var svgHeight = 800;
-var bubbleChartWidth = 1000;
-var totalBubbleChartHeight = 300;
-var bubbleChartHeight = 250;
-var lineChartWidth = 1000;
-var lineChartHeight = 300;
+var totalChartHeight = 300;
+var chartWidth = 1000;
+var chartHeight = 300;
 var detailsWidth = 1000;
 var detailsHeight = 200;
 var filtersWidth = 200;
 var filtersHeight = 800;
 
+// svg variables
+var svg, bubbleSvg, detailsSvg, lineSvg, filtersSvg;
+
+// array of 20 colors - will be indexed/accessed by genre name (e.g. color[Comedy])
+var color = d3.scale.category20();
+
+// Linechart Variables
+// once data is imported, will map genre name to values (.year and .count)
+var genres;
+
 // Bubblechart variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var bubbleSvg;
 var monthNames = ["Jan", "Feb", "Mar", "April", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 var years = [1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1992, 1993, 1994, 1995, 1996,
              1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
@@ -47,8 +54,9 @@ var dateFormat = d3.time.format("%Y-%m-%d").parse;
 var indexCurrYValue = 0;
 var yValues = ["inflation_domestic_income", "domestic_income"];
 
-var xScaleOffset = 50;
-var yScaleOffset = 50;
+var scaleOffset = 50;
+var axisLabelMargin = 40;
+var axisLabelWidth = 50;
 
 // Radius of a bubble
 var radius = 10;
@@ -59,30 +67,42 @@ var factor = 1000000.0;
 
 // set up the svg layout 
 function setupLayout(){
-	
-
-				
-
-	/*var detailsSvg = svg.append("svg")
+	/*
+	svg = d3.select("body")
+				.append("svg:svg")
+				.attr("width", svgWidth)
+				.attr("height", svgHeight);
+	*/			
+	bubbleSvg = d3.select("body").append("svg")
+						//.attr("id", "bubbleChart")
+						.attr("x", "0")
+						.attr("y", "0")
+						.attr("width", chartWidth)
+						.attr("height", chartHeight)
+						.attr("overflow","visible");
+	detailsSvg = d3.select("body").append("svg")
 						//.attr("id", "details")
 						.attr("x", "0")
-						.attr("y", "bubbleChartHeight")
+						.attr("y", chartHeight)
 						.attr("width", detailsWidth)
-						.attr("height", detailsHeight);
-	var lineSvg = svg.append("svg")
+						.attr("height", detailsHeight)
+						.attr("overflow","visible");
+	lineSvg = d3.select("body").append("svg")
 						//.attr("id", "lineChart")
 						.attr("x", "0")
-						.attr("y", "bubbleChartHeight + detailsHeight")
-						.attr("width", lineChartWidth)
-						.attr("height", lineChartHeight);
-	var filtersSvg = svg.append("svg")
+						.attr("y", (chartHeight + detailsHeight))
+						.attr("width", chartWidth)
+						.attr("height", chartHeight)
+						.attr("overflow","visible");
+	filtersSvg = d3.select("body").append("svg")
 						//.attr("id", "filters")
-						.attr("x", "bubbleChartWidth")
+						.attr("x", chartWidth)
 						.attr("y", "0")
 						.attr("width", filtersWidth)
-						.attr("height", filtersHeight);*/
+						.attr("height", filtersHeight)
+						.attr("overflow","visible");
 }
-setupLayout();
+
 loadData(files[0]);
 loadData(files[1]);
 
@@ -99,13 +119,26 @@ function loadData(filename){
         else{
             console.log(data);  //DEBUG: delete this later...     
             if (filename == files[0]) {
+            	setupLayout();
             	moviesDataset = data;
             	generateBubbleGraph();
             	//generateSidePanel();
             }  
             else {
             	genresDataset = data;
-            	//generateLineGraph();
+            	// adapted example from http://bl.ocks.org/mbostock/3884955
+	            color.domain(d3.keys(data[0]).filter(function(key) { return key !== "year"; }));
+	            
+	            genres = color.domain().map(function(name) {
+							    return {
+							      name: name,
+							      values: data.map(function(d) {
+							        return { year: d.year, count: +d[name]};
+							      })
+							    };
+							  });
+							  
+            	generateLineGraph();
             }
      
     		
@@ -117,6 +150,7 @@ function loadData(filename){
  * Generates the bubble chart. 
  */
 function generateBubbleGraph(){
+	/*
 	svg = d3.select("body")
 			.append("svg")
 			.attr("class", "visualization")
@@ -127,17 +161,18 @@ function generateBubbleGraph(){
 					.attr("id", "bubbleChart")
 					.attr("x", "0")
 					.attr("y", "0")
-					.attr("width", bubbleChartWidth)
-					.attr("height", totalBubbleChartHeight);
+					.attr("width", chartWidth)
+					.attr("height", totalChartHeight);
+	*/
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear, startMonth, startDay), new Date(currYear, endMonth, endDay)])
-        					.range([xScaleOffset, bubbleChartWidth - xScaleOffset]);
+        					.range([scaleOffset, chartWidth - scaleOffset]);
         			
     var bubbleYScale = d3.scale.linear()
     						.domain([d3.min(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;}),
     								d3.max(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
-    						.range([bubbleChartHeight, 0]);
+    						.range([chartHeight - scaleOffset, scaleOffset]);
     						
 	var bubbleXAxis = d3.svg.axis()
 						.scale(bubbleXScale)
@@ -151,21 +186,23 @@ function generateBubbleGraph(){
 					
 	bubbleSvg.append("g")
 		.attr("class", "axis")
-		.attr("transform", "translate(0," + bubbleChartHeight + ")")
+		.attr("transform", "translate(0," + (chartHeight - scaleOffset) + ")")
 		.call(bubbleXAxis)
 		.append("text")
-		.attr("x", bubbleChartWidth / 2 - 50)
-		.attr("y", 35)
+		.attr("text-anchor","middle")
+		.attr("x", (chartWidth - scaleOffset) / 2)
+		.attr("y", axisLabelMargin)
 		.text("Movie Release Date");
 	
 	bubbleSvg.append("g")
 		.attr("class", "axis")
-		.attr("transform", "translate(" + yScaleOffset + ", 0)")
+		.attr("transform", "translate(" + scaleOffset + ", 0)")
 		.call(bubbleYAxis)
 		.append("text")
+		.attr("text-anchor","middle")
 		.attr("transform","rotate(-90)")
-		.attr("x", -bubbleChartHeight + determineCurrentLabel().length / 2)
-        .attr("y", -40)
+		.attr("x", -(chartHeight) / 2)
+        .attr("y", -axisLabelMargin)
         .text(determineCurrentLabel());	
         
 	var bubbles = bubbleSvg.append("g")
@@ -201,3 +238,98 @@ function determineCurrentLabel() {
 	}
 	return "Domestic Income (in USD millions)";
 }
+
+
+/*
+ * generates the line graph to display genre data
+ * @author Allison Chislett
+ * @version Oct30_2013
+ */
+function generateLineGraph(){
+	
+	// setup axis scales
+	var maxGenreCount = 15;
+	var lineXScale = d3.scale.linear()
+        					.domain([years[0],years[years.length-1]])
+        					.range([scaleOffset, chartWidth - scaleOffset]);
+
+    var lineYScale = d3.scale.linear()
+    						.domain([maxGenreCount,0])
+    						.range([scaleOffset, chartHeight - scaleOffset]);
+    						
+	var line = d3.svg.line()
+				    //.interpolate("basis") // gives line smooth curves
+				    .x(function(d) { return lineXScale(d.year); })
+				    .y(function(d) { return lineYScale(d.count); });
+    
+    
+	// draw axes
+	
+	
+	var lineXAxis = d3.svg.axis()
+						.scale(lineXScale)
+						.orient("bottom")
+						.ticks(30)
+						.tickFormat(d3.format(".0f"));
+				
+	var lineYAxis = d3.svg.axis()
+						.scale(lineYScale)
+						.orient("left")
+						.ticks(8);
+				
+	lineSvg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (chartHeight-scaleOffset) + ")")
+				.call(lineXAxis)
+				.append("text")
+					.attr("text-anchor","middle")
+					.attr("x", (chartWidth - scaleOffset) / 2)
+					.attr("y", axisLabelMargin)
+					.text("Year");
+				
+	lineSvg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + scaleOffset + ",0)")
+				.call(lineYAxis)
+				.append("text")
+					.attr("transform","rotate(-90)")
+					.attr("text-anchor","middle")
+					.attr("x", -(chartHeight) / 2)
+			        .attr("y", -axisLabelMargin)
+			        .text("Number of Movies in Top 25");
+			        
+			        
+	// draw lines
+	var genre = lineSvg.selectAll(".genre")
+					      	.data(genres)
+					    	.enter()
+					    	.append("g")
+					      	.attr("class", "genre");
+						      	
+	genre.append("path")
+	      .attr("class", "line")
+	      .attr("d", function(d) { return line(d.values); })
+	      .on("mouseover", function(d) { d3.select(this).moveToFront(); highlight(this); })
+	      .on("mouseout", function(d) { unhighlight(this); })
+	      .style("stroke", function(d) { return color(d.name); })
+	      .style("stroke-width", 2)
+	      .style("fill","none")
+	      .append("title")
+          .text(function(d) { return d.name;});
+	
+
+}
+
+
+
+function highlight(o) {
+	
+	d3.select(o)
+		.style("stroke-width",4);
+}
+
+function unhighlight(o) {
+	d3.select(o)
+		.style("stroke-width",2);
+}
+
