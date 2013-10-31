@@ -1,3 +1,9 @@
+d3.selection.prototype.moveToFront = function() {
+return this.each(function(){
+this.parentNode.appendChild(this);
+});
+};
+
 // Contains the top 25 movies from 1983-2012 
 var moviesDataset;
 
@@ -59,7 +65,8 @@ var axisLabelMargin = 40;
 var axisLabelWidth = 50;
 
 // Radius of a bubble
-var radius = 10;
+var radius = 7;
+var stroke = 4;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
@@ -244,7 +251,16 @@ function generateBubbleGraph(){
 					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); //bubbleYScale(d.inflation_domestic_income / factor);
 			})
 			.attr("r", radius)
-			.attr("fill", "rgb(19,117,255)")
+			.attr("fill", function (d) {
+				return color(d.genre1);
+			})
+			.attr("stroke", function (d) {
+				if (d.genre2 != "") {
+					return color(d.genre2);
+				}
+				return color(d.genre1);
+			})
+			.attr("stroke-width", stroke)
 			.attr("opacity", function (d) {
 				if (d.production_year != currYear){
 					return 0.0;
@@ -334,7 +350,7 @@ function generateLineGraph(){
 	genre.append("path")
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
-	      .on("mouseover", function(d) { d3.select(this).moveToFront(); highlight(this); })
+	      .on("mouseover", function(d) { d3.select(this.parentNode).moveToFront(); highlight(this); })
 	      .on("mouseout", function(d) { unhighlight(this); })
 	      .style("stroke", function(d) { return color(d.name); })
 	      .style("stroke-width", 2)
