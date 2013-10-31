@@ -67,34 +67,34 @@ var factor = 1000000.0;
 
 // set up the svg layout 
 function setupLayout(){
-	/*
+	
 	svg = d3.select("body")
 				.append("svg:svg")
 				.attr("width", svgWidth)
 				.attr("height", svgHeight);
-	*/			
-	bubbleSvg = d3.select("body").append("svg")
+			
+	bubbleSvg = svg.append("svg")
 						//.attr("id", "bubbleChart")
 						.attr("x", "0")
 						.attr("y", "0")
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
-	detailsSvg = d3.select("body").append("svg")
+	detailsSvg = svg.append("svg")
 						//.attr("id", "details")
 						.attr("x", "0")
 						.attr("y", chartHeight)
 						.attr("width", detailsWidth)
 						.attr("height", detailsHeight)
 						.attr("overflow","visible");
-	lineSvg = d3.select("body").append("svg")
+	lineSvg = svg.append("svg")
 						//.attr("id", "lineChart")
 						.attr("x", "0")
 						.attr("y", (chartHeight + detailsHeight))
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
-	filtersSvg = d3.select("body").append("svg")
+	filtersSvg = svg.append("svg")
 						//.attr("id", "filters")
 						.attr("x", chartWidth)
 						.attr("y", "0")
@@ -122,7 +122,8 @@ function loadData(filename){
             	setupLayout();
             	moviesDataset = data;
             	generateBubbleGraph();
-            	//generateSidePanel();
+            	generateDetails();
+            	
             }  
             else {
             	genresDataset = data;
@@ -139,6 +140,7 @@ function loadData(filename){
 							  });
 							  
             	generateLineGraph();
+            	generateSidePanel();
             }
      
     		
@@ -146,6 +148,29 @@ function loadData(filename){
     });	
 }
 
+/*
+ * Creates the side panel.
+ */
+function generateSidePanel() {
+	filtersSvg.append("rect")
+				.attr("x", "0")
+				.attr("y", "0")
+				.attr("width", filtersWidth)
+				.attr("height", filtersHeight)
+				.attr("fill", "rgb(255,0,0)");
+}
+
+/*
+ * Creates the details-on-demand space.
+ */
+function generateDetails() {
+	detailsSvg.append("rect")
+				.attr("x", "0")
+				.attr("y", "0")
+				.attr("width", detailsWidth)
+				.attr("height", detailsHeight)
+				.attr("fill", "rgb(0,0,255)");
+}
 /*
  * Generates the bubble chart. 
  */
