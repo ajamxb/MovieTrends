@@ -12,7 +12,8 @@ var svg;
 var svgWidth = 1200;
 var svgHeight = 800;
 var bubbleChartWidth = 1000;
-var bubbleChartHeight = 300;
+var totalBubbleChartHeight = 300;
+var bubbleChartHeight = 250;
 var lineChartWidth = 1000;
 var lineChartHeight = 300;
 var detailsWidth = 1000;
@@ -36,6 +37,12 @@ var endMonth = 11;
 var startDay = 1; 
 var endDay = 31; // Because year ends with December, we use 31st
 
+var startDate = "2013-01-01";
+var endDate = "2013-12-31";
+
+// Format used to parced the dates in the csv
+var dateFormat = d3.time.format("%Y-%m-%d").parse;
+
 // Indicates the graph's current mode (e.g., domestic income or inflation adjusted income)
 var indexCurrYValue = 0;
 var yValues = ["inflation_domestic_income", "domestic_income"];
@@ -43,6 +50,8 @@ var yValues = ["inflation_domestic_income", "domestic_income"];
 var xScaleOffset = 50;
 var yScaleOffset = 50;
 
+// Radius of a bubble
+var radius = 10;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
@@ -110,30 +119,26 @@ function loadData(filename){
 function generateBubbleGraph(){
 	svg = d3.select("body")
 			.append("svg")
-			.attr("class", "bubbleChart")
+			.attr("class", "visualization")
 			.attr("width", svgWidth)
 			.attr("height", svgHeight);
 				
 	bubbleSvg = svg.append("svg")
-					//.attr("id", "bubbleChart")
+					.attr("id", "bubbleChart")
 					.attr("x", "0")
 					.attr("y", "0")
 					.attr("width", bubbleChartWidth)
-					.attr("height", bubbleChartHeight);
+					.attr("height", totalBubbleChartHeight);
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
-        					.domain([new Date(currYear, startMonth, startDay), new Date(currYear, endMonth, endDay)])
+							.domain([new Date(currYear, startMonth, startDay), new Date(currYear, endMonth, endDay)])
         					.range([xScaleOffset, bubbleChartWidth - xScaleOffset]);
-
-
         			
     var bubbleYScale = d3.scale.linear()
-    				//.domain([0, d3.max(moviesDataset, function(d) {
-    					//return parseInt(d[yValues[indexCurrYValue]]);
-    				//})])
-    						.domain([d3.max(moviesDataset, function(d) { return parseInt(d[yValues[indexCurrYValue]]) / factor;}),
-    				 		0])
-    						.range([yScaleOffset, bubbleChartHeight]);
+    						.domain([d3.min(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;}),
+    								d3.max(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
+    						.range([bubbleChartHeight, 0]);
+    						
 	var bubbleXAxis = d3.svg.axis()
 						.scale(bubbleXScale)
 						.orient("bottom")
@@ -144,7 +149,7 @@ function generateBubbleGraph(){
 						.orient("left")
 						.ticks(6);
 					
-	svg.append("g")
+	bubbleSvg.append("g")
 		.attr("class", "axis")
 		.attr("transform", "translate(0," + bubbleChartHeight + ")")
 		.call(bubbleXAxis)
@@ -153,7 +158,7 @@ function generateBubbleGraph(){
 		.attr("y", 35)
 		.text("Movie Release Date");
 	
-	svg.append("g")
+	bubbleSvg.append("g")
 		.attr("class", "axis")
 		.attr("transform", "translate(" + yScaleOffset + ", 0)")
 		.call(bubbleYAxis)
@@ -163,12 +168,27 @@ function generateBubbleGraph(){
         .attr("y", -40)
         .text(determineCurrentLabel());	
         
-	var bubbles = svg.selectAll("circles")
+	var bubbles = bubbleSvg.append("g")
+						.attr("class", "bubbles")
+						.selectAll("circle")
 						.data(moviesDataset)
 						.enter()
-						.append("circle");	
+						.append("circle");
 	
-	//bubbles.attr("cx", function(d, i))
+	bubbles.attr("cx", function(d) {
+					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
+				})
+			.attr("cy", function (d) {
+					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); //bubbleYScale(d.inflation_domestic_income / factor);
+			})
+			.attr("r", radius)
+			.attr("fill", "rgb(19,117,255)")
+			.attr("opacity", function (d) {
+				if (d.production_year != currYear){
+					return 0.0;
+				}
+				return 0.80;
+			});
 }
 
 /*
