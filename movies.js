@@ -1,9 +1,3 @@
-d3.selection.prototype.moveToFront = function() {
-	return this.each(function(){
-				this.parentNode.appendChild(this);
-				});
-};
-
 // Contains the top 25 movies from 1983-2012 
 var moviesDataset;
 
@@ -73,6 +67,16 @@ var stroke = 4;
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
+
+/*
+ * We have referenced this code from https://gist.github.com/trtg/3922684
+ * We use this to move an element to the front.
+ */
+d3.selection.prototype.moveToFront = function() {
+	return this.each(function(){
+				this.parentNode.appendChild(this);
+				});
+};
 
 // set up the svg layout 
 function setupLayout(){
@@ -292,6 +296,8 @@ function generateBubbleGraph(){
 /*
  * Determines the label for the y-axes based on what mode (adjusted income or
  * actual domestic income) the user is in.
+ * 
+ * @author Annette Almonte
  */      
 function determineCurrentLabel() {
 	if (indexCurrYValue == 0) {
