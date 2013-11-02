@@ -1,7 +1,7 @@
 d3.selection.prototype.moveToFront = function() {
-return this.each(function(){
-this.parentNode.appendChild(this);
-});
+	return this.each(function(){
+				this.parentNode.appendChild(this);
+				});
 };
 
 // Contains the top 25 movies from 1983-2012 
@@ -24,6 +24,8 @@ var detailsWidth = 1000;
 var detailsHeight = 200;
 var filtersWidth = 200;
 var filtersHeight = 800;
+
+var hiddenCoordinate = -100;
 
 // svg variables
 var svg, bubbleSvg, detailsSvg, lineSvg, filtersSvg;
@@ -245,15 +247,33 @@ function generateBubbleGraph(){
 						.append("circle");
 	
 	bubbles.attr("cx", function(d) {
+				if (d.production_year == currYear) {
 					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
-				})
+				}
+				return hiddenCoordinate; 
+			})
 			.attr("cy", function (d) {
+				if (d.production_year == currYear) {
 					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); //bubbleYScale(d.inflation_domestic_income / factor);
+				}
+				return hiddenCoordinate;
 			})
 			.attr("r", radius)
 			.attr("fill", function (d) {
 				return color(d.genre1);
 			})
+			.on("mouseover", function(d) { 
+                                d3.select(this.parentNode)
+                                    .selectAll("circle")
+                                    .attr("opacity", 0.5);
+                                d3.select(this).moveToFront()
+                                    .attr("opacity", 1.0);
+                            })
+            .on("mouseout", function(d) { 
+                                d3.select(this.parentNode)
+                                	.selectAll("circle")
+                                	.attr("opacity", 1.0);
+            })
 			.attr("stroke", function (d) {
 				if (d.genre2 != "") {
 					return color(d.genre2);
@@ -265,7 +285,7 @@ function generateBubbleGraph(){
 				if (d.production_year != currYear){
 					return 0.0;
 				}
-				return 0.80;
+				return 1.0;
 			});
 }
 
@@ -350,8 +370,15 @@ function generateLineGraph(){
 	genre.append("path")
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
-	      .on("mouseover", function(d) { d3.select(this.parentNode).moveToFront(); highlight(this); })
-	      .on("mouseout", function(d) { unhighlight(this); })
+	      .on("mouseover", function(d) { 
+	      	d3.selectAll(".line")
+	      		.attr("opacity", 0.2)
+	      	d3.select(this.parentNode).moveToFront() 
+	      	highlight(this); 
+	      })
+	      .on("mouseout", function(d) { 
+	      	unhighlight(this); 
+	      })
 	      .style("stroke", function(d) { return color(d.name); })
 	      .style("stroke-width", 2)
 	      .style("fill","none")
@@ -362,14 +389,22 @@ function generateLineGraph(){
 }
 
 
-
+/*
+ * Highlights the line that's being hovered over.
+ */
 function highlight(o) {
-	
 	d3.select(o)
+	    .attr("opacity", 1.0)
 		.style("stroke-width",4);
 }
 
+/*
+ * Returns all of the lines to their normal state when
+ * the user is not hovering over any of them.
+ */
 function unhighlight(o) {
+	d3.selectAll(".line")
+	    .attr("opacity", 1.0)
 	d3.select(o)
 		.style("stroke-width",2);
 }
