@@ -263,16 +263,16 @@ function generateBubbleGraph(){
 				return color(d.genre1);
 			})
 			.on("mouseover", function(d) { 
-                                d3.select(this.parentNode)
-                                    .selectAll("circle")
-                                    .attr("opacity", 0.5);
-                                d3.select(this).moveToFront()
-                                    .attr("opacity", 1.0);
-                            })
+            	d3.select(this.parentNode)
+                	.selectAll("circle")
+                    .attr("opacity", 0.5);
+                d3.select(this).moveToFront()
+                	.attr("opacity", 1.0);
+            })
             .on("mouseout", function(d) { 
-                                d3.select(this.parentNode)
-                                	.selectAll("circle")
-                                	.attr("opacity", 1.0);
+                d3.select(this.parentNode)
+                	.selectAll("circle")
+                    .attr("opacity", 1.0);
             })
 			.attr("stroke", function (d) {
 				if (d.genre2 != "") {
