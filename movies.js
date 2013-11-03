@@ -15,7 +15,7 @@ var totalChartHeight = 300;
 var chartWidth = 1000;
 var chartHeight = 300;
 var detailsWidth = 1000;
-var detailsHeight = 200;
+var detailsHeight = 150; //200;
 var filtersWidth = 200;
 var filtersHeight = 800;
 
@@ -23,6 +23,9 @@ var hiddenCoordinate = -100;
 
 // svg variables
 var svg, bubbleSvg, detailsSvg, lineSvg, filtersSvg;
+
+// Details on demand space
+var detailsRect;
 
 // array of 20 colors - will be indexed/accessed by genre name (e.g. color[Comedy])
 var color = d3.scale.category20();
@@ -32,7 +35,7 @@ var color = d3.scale.category20();
 var genres;
 
 // Bubblechart variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var monthNames = ["Jan", "Feb", "Mar", "April", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
 var years = [1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1992, 1993, 1994, 1995, 1996,
              1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
              2012];
@@ -67,6 +70,8 @@ var stroke = 4;
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
+
+var currDistributor, currRating, currGenre, currTitle, currBudget, currIncome, currAdjustedIncome;
 
 /*
  * We have referenced this code from https://gist.github.com/trtg/3922684
@@ -178,11 +183,69 @@ function generateSidePanel() {
  */
 function generateDetails() {
 	detailsSvg.append("rect")
-				.attr("x", "0")
-				.attr("y", "0")
-				.attr("width", detailsWidth)
-				.attr("height", detailsHeight)
-				.attr("fill", "rgb(0,0,255)");
+					.attr("x", "0")
+					.attr("y", "0")
+					.attr("width", detailsWidth)
+					.attr("height", detailsHeight)
+					.attr("fill", "rgb(240,240,240)");
+}
+
+
+/*
+ * Displays the data pertaining to a movie when a user
+ * hovers over a bubble.
+ */
+function displayDetails() {
+	detailsSvg.append("svg:text")
+    			.attr("x", 20)
+				.attr("y", 40)
+        		.attr("text-anchor", "start")
+        		.text(currDistributor)
+        		
+    detailsSvg.append("svg:text")
+        	   	.attr("x", 20)
+        	   	.attr("y", 80)
+        	   	.attr("text-anchor", "start")
+        	   	.text(currRating);
+        	   	
+    detailsSvg.append("svg:text")
+        	   	.attr("x", 20)
+        	   	.attr("y", 120)
+        	   	.attr("text-anchor", "start")
+        	   	.text(currGenre);
+        	   	
+    detailsSvg.append("svg:text")
+    			.attr("class", "movieTitle")
+        	   	.attr("x", detailsWidth / 2)
+        	   	.attr("y", 80)
+        	   	.attr("text-anchor", "middle")
+        	   	.text(currTitle); 
+
+    detailsSvg.append("svg:text")
+        	   	.attr("x", detailsWidth - 20)
+        	   	.attr("y", 40)
+        	   	.attr("text-anchor", "end")
+        	   	.text(currBudget);
+
+    detailsSvg.append("svg:text")
+        	   	.attr("x", detailsWidth - 20)
+        	   	.attr("y", 80)
+        	   	.attr("text-anchor", "end")
+        	   	.text(currIncome);
+
+    detailsSvg.append("svg:text")
+        	   	.attr("x", detailsWidth - 20)
+        	   	.attr("y", 120)
+        	   	.attr("text-anchor", "end")
+        	   	.text(currAdjustedIncome);        	   	
+        	   	       	        	   	       	
+}
+
+/*
+ * Removes the data displayed in the DoD area.
+ */
+function removeDetails() {
+	detailsSvg.selectAll("text").remove();
 }
 /*
  * Generates the bubble chart. 
@@ -272,11 +335,27 @@ function generateBubbleGraph(){
                     .attr("opacity", 0.5);
                 d3.select(this).moveToFront()
                 	.attr("opacity", 1.0);
+               	currDistributor = "Distributor: " + d.distributor;
+               	currRating = "Rating: " + d.rating;
+               	currGenre = "Genre: " + d.genre;
+               	currTitle = d.title;
+               	currBudget = "Production Budget: $" + d.production_budget;
+               	currIncome = "Domestic Income: $" + d.domestic_income;
+               	currAdjustedIncome = "Adjusted Income: $" + d.inflation_domestic_income;
+               	displayDetails();
             })
             .on("mouseout", function(d) { 
                 d3.select(this.parentNode)
                 	.selectAll("circle")
                     .attr("opacity", 1.0);
+               	currDistributor = "";
+               	currRating = "";
+               	currGenre = "";
+               	currTitle = "";
+               	currBudget = "";
+               	currIncome = "";
+               	currAdjustedIncome = "";
+               	removeDetails();
             })
 			.attr("stroke", function (d) {
 				if (d.genre2 != "") {
