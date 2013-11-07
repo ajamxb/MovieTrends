@@ -385,6 +385,16 @@ function determineCurrentLabel() {
 	return "Domestic Income (in USD millions)";
 }
 
+/*
+ * Updates bubble graph to display current selected year
+ */
+function updateBubbleGraph() {
+	
+	bubbleSvg.selectAll("g").remove();
+	
+	generateBubbleGraph();
+}
+
 
 /*
  * generates the line graph to display genre data
@@ -410,8 +420,6 @@ function generateLineGraph(){
     
     
 	// draw axes
-	
-	
 	var lineXAxis = d3.svg.axis()
 						.scale(lineXScale)
 						.orient("bottom")
@@ -446,30 +454,69 @@ function generateLineGraph(){
 			        
 			        
 	// draw lines
-	var genre = lineSvg.selectAll(".genre")
+	var genreLines = lineSvg.selectAll(".genreLine")
 					      	.data(genres)
 					    	.enter()
 					    	.append("g")
-					      	.attr("class", "genre");
+					      	.attr("class", "genreLine");
 						      	
-	genre.append("path")
+	genreLines.append("path")
+		  .attr("id", function(d) { return d.name.concat("Line"); })
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
 	      .on("mouseover", function(d) { 
-	      	d3.selectAll(".line")
-	      		.attr("opacity", 0.2)
-	      	d3.select(this.parentNode).moveToFront() 
-	      	highlight(this); 
+	      	highlightLine(d3.select(this)); 
 	      })
 	      .on("mouseout", function(d) { 
-	      	unhighlight(this); 
+	      	unhighlightLine(d3.select(this)); 
 	      })
 	      .style("stroke", function(d) { return color(d.name); })
 	      .style("stroke-width", 2)
 	      .style("fill","none")
 	      .append("title")
           .text(function(d) { return d.name;});
-	
+     
+    // create dots on data points (one per genre per year) 
+    // these will appear on a line when the data point on the line is hovered over
+
+    var genreNames = d3.keys(genresDataset[0]).filter(function(key) { return key !== "year"; });
+    
+    //var genrePoints = lineSvg.append("g")
+    //						.attr("class", "genrePoints");
+ 
+	for (var n in genreNames) {
+		var genreName = genreNames[n];
+		var idName = genreName.concat("Point");
+	    var genrePoints = lineSvg.append("g")
+	    			.attr("id", idName.concat("s"))
+	    			.attr("class", "genrePoint");
+		
+		genrePoints.selectAll("circle")
+			      	.data(genresDataset)
+			    	.enter()
+			    	.append("circle")
+			    	.attr("id", function(d) { return d.year.toString().concat(idName); })
+			      	.attr("class", "point")
+			      	.attr("cx", function(d) { return lineXScale(d.year); })
+					.attr("cy", function(d) { return lineYScale(d[genreName]); })
+					.attr("r", 6)
+					.on("mouseover", function(d) {
+						highlightPoint(this); 
+					})
+					.on("mouseout", function(d) { 
+						unhighlightPoint(this); 
+					})
+					.on("click", function(d) { currYear = d.year; 
+												updateBubbleGraph(); })
+	 				.attr("opacity", 0.0)
+	 				.style("stroke", function(d) { return color(genreName); })
+	 				.style("stroke-width", 2)
+					.style("fill", "white")
+					.append("title")
+					.text(function(d) { return d.year.concat("\n",genreName," : ",d[genreName]); });
+		
+		d3.selectAll(".genrePoint").moveToFront();
+	}
 
 }
 
@@ -477,20 +524,58 @@ function generateLineGraph(){
 /*
  * Highlights the line that's being hovered over.
  */
-function highlight(o) {
-	d3.select(o)
-	    .attr("opacity", 1.0)
+function highlightLine(o) {
+	d3.selectAll(".line")
+	      		.attr("opacity", 0.2);
+	      		
+	d3.select(this.parentNode).moveToFront();
+	
+	o.attr("opacity", 1.0)
 		.style("stroke-width",4);
+			
+	d3.selectAll(".genrePoint").moveToFront();
 }
 
 /*
  * Returns all of the lines to their normal state when
  * the user is not hovering over any of them.
  */
-function unhighlight(o) {
+function unhighlightLine(o) {
 	d3.selectAll(".line")
-	    .attr("opacity", 1.0)
-	d3.select(o)
-		.style("stroke-width",2);
+	    .attr("opacity", 1.0);
+	    
+	o.style("stroke-width",2);
+		
+	d3.selectAll(".genrePoint").moveToFront();
 }
 
+/*
+ * Highlights the point that's being hovered over.
+ */
+function highlightPoint(o) {
+	d3.select(o)
+		.attr("opacity", 1.0);
+	
+	var p = "#";
+	var lineId = p.concat(d3.select(o.parentNode).attr("id").replace("Points","Line"));
+	var line = d3.select(lineId);
+	highlightLine(line);
+	      		
+	d3.selectAll(".genrePoint").moveToFront();
+}
+
+/*
+ * Returns the point to its normal state when
+ * the user is not hovering over it.
+ */
+function unhighlightPoint(o) {
+	d3.select(o)
+		.attr("opacity", 0.0);
+	
+	var p = "#";
+	var lineId = p.concat(d3.select(o.parentNode).attr("id").replace("Points","Line"));
+	var line = d3.select(lineId);
+	unhighlightLine(line);
+	        
+	d3.selectAll(".genrePoint").moveToFront();
+}
