@@ -6,8 +6,104 @@
     <link rel="stylesheet" type="text/css" href="movies.css">
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="movies.js"></script>
+	
+	
 </head>
-<body>
 
+<body>
+	<div id="data" style="float: left">
+
+    </div>
+    <div id="filter" style="float: left">
+        <select>
+            <option>Genre</option>
+            <option>Rating</option>
+        </select>
+		<ul>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="action"  name="Action"
+             onclick="selectGenre('Action');">
+             Action</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="adventure"  name="Adventure"
+             onclick="selectGenre('Adventure');">
+             Adventure</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="animation"  name="Animation"
+             onclick="selectGenre('Animation');">
+             Animation</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="comedy"  name="Comedy"
+             onclick="selectGenre('Comedy');">
+             Comedy</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="crime"  name="Crime"
+             onclick="selectGenre('Crime');">
+             Crime</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="documentary"  name="Documentary"
+             onclick="selectGenre('Documentary');">
+             Documentary</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="drama"  name="Drama"
+             onclick="selectGenre('Drama');">
+             Drama</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="fantasy"  name="Fantasy"
+             onclick="selectGenre('Fantasy');">
+             Fantasy</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="horror"  name="Horror"
+             onclick="selectGenre('Horror');">
+             Horror</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="musical"  name="Musical"
+             onclick="selectGenre('Musical');">
+             Musical</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="romance"  name="Romance"
+             onclick="selectGenre('Romance');">
+             Romance</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="scifi"  name="SciFi"
+             onclick="selectGenre('SciFi');">
+             SciFi</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="sports"  name="Sports"
+             onclick="selectGenre('Sports');">
+             Sports</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="thriller"  name="Thriller"
+             onclick="selectGenre('Thriller');">
+             Thriller</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="war"  name="War"
+             onclick="selectGenre('War');">
+             War</label></li>
+		<li><label class="checkbox">
+             <input class="selectGenre" type="checkbox" id="western"  name="Western"
+             onclick="selectGenre('Western');">
+             Western</label></li>
+			 
+		</ul>
+		<ul>
+		<li><label class="checkbox">
+             <input class="selectRating" type="checkbox" id="g"  name="G"
+             onclick="selectRating('G');">
+             G</label></li>
+		<li><label class="checkbox">
+             <input class="selectRating" type="checkbox" id="pg"  name="PG"
+             onclick="selectRating('PG');">
+             PG</label></li>
+		<li><label class="checkbox">
+             <input class="selectRating" type="checkbox" id="pg13"  name="PG-13"
+             onclick="selectRating('PG-13');">
+             PG-13</label></li>
+		<li><label class="checkbox">
+             <input class="selectRating" type="checkbox" id="r"  name="RS"
+             onclick="selectRating('R');">
+             R</label></li>
+		</ul>
+    </div>
 </body>
 </html>
