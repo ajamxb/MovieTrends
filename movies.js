@@ -9,7 +9,7 @@ var files = new Array("1983-2012_movies.csv", "1983-2012_genres.csv");
 
 // Dimensions for all the components in our vis
 var svg;
-var svgWidth = 1200;
+var svgWidth = 1000;
 var svgHeight = 800;
 var totalChartHeight = 300;
 var chartWidth = 1000;
@@ -22,7 +22,7 @@ var filtersHeight = 800;
 var hiddenCoordinate = -100;
 
 // svg variables
-var svg, bubbleSvg, detailsSvg, lineSvg, filtersSvg;
+var svg, bubbleSvg, detailsSvg, lineSvg;
 
 // Details on demand space
 var detailsRect;
@@ -86,8 +86,12 @@ d3.selection.prototype.moveToFront = function() {
 // set up the svg layout 
 function setupLayout(){
 	
-	svg = d3.select("body")
-				.append("svg:svg")
+	var data = d3.select("#data");
+	
+	data.attr("width", svgWidth)
+		.attr("height", svgHeight);
+	
+	svg = data.append("svg:svg")
 				.attr("width", svgWidth)
 				.attr("height", svgHeight);
 			
@@ -112,13 +116,7 @@ function setupLayout(){
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
-	filtersSvg = svg.append("svg")
-						//.attr("id", "filters")
-						.attr("x", chartWidth)
-						.attr("y", "0")
-						.attr("width", filtersWidth)
-						.attr("height", filtersHeight)
-						.attr("overflow","visible");
+	
 }
 
 loadData(files[0]);
@@ -170,12 +168,7 @@ function loadData(filename){
  * Creates the side panel.
  */
 function generateSidePanel() {
-	filtersSvg.append("rect")
-				.attr("x", "0")
-				.attr("y", "0")
-				.attr("width", filtersWidth)
-				.attr("height", filtersHeight)
-				.attr("fill", "rgb(255,0,0)");
+
 }
 
 /*
