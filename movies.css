@@ -20,7 +20,9 @@ svg{
     font-size: 11px;
 }
 
-
+.bar: hover{
+	fill:grey;
+}
 .movieTitle {
 		font-family: monospace;
         font-size: 30px;
