@@ -10,7 +10,7 @@ var files = new Array("1983-2012_movies.csv", "1983-2012_genre_groups_income_inf
 // Dimensions for all the components in our vis
 var svg;
 var svgWidth = 1000;
-var svgHeight = 1400; //Changed for the bar graph. 
+var svgHeight = 800; //Changed for the bar graph. 
 var totalChartHeight = 300;
 var chartWidth = 1000;
 var chartHeight = 300;
@@ -119,13 +119,7 @@ function setupLayout(){
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
-	barSvg = svg.append("svg")
-                                                //.attr("id", "barChart")
-                                                .attr("x", "0")
-                                                .attr("y", (chartHeight+detailsHeight+290))
-                                                .attr("width", chartWidth)
-                                                .attr("height", chartHeight)
-                                                .attr("overflow","visible");
+	
 	
 }
 
@@ -149,7 +143,7 @@ function loadData(filename){
             	moviesDataset = data;
             	generateBubbleGraph();
             	generateDetails();
-            	generateBarGraph();
+            	barGraph();
             	
             }  
             else {
@@ -417,118 +411,68 @@ function updateBubbleGraph() {
 }
 
 
-/*
+  
+  /*
 * generates the bar graph to display the total income of the particular year.
 *@author Bharadwaj Tanikella
 */
-function generateBarGraph(){
-	var valueLabelWidth = 40; // space reserved for value labels (right)
-	var barHeight = 20; // height of one bar
-	var barLabelWidth = 100; // space reserved for bar labels
-	var barLabelPadding = 5; // padding between bar and bar labels (left)
-	var gridLabelHeight = 18; // space reserved for gridline labels
-	var gridChartOffset = 3; // space between start of grid and first bar
-	var maxBarWidth = 420; // width of the bar with the max value
+function barGraph(){
+	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-	// data aggregation
-	var aggregatedData = d3.nest()
-	  .key(function(d) { return d['production_year']; })
-	  .rollup(function(d) {
-		return {
-		  'value': d3.sum(d, function(e) { return parseFloat(e['inflation_domestic_income']); })
-		};
-	  })
-	  .entries(moviesDataset);
-		
-	// accessor functions 
-	var barLabel = function(d) { return d.key; };
-	var barValue = function(d) { return d.values.value; };
-	 
-	// scales
-	var yScale = d3.scale.ordinal()
-						.domain(d3.range(0, aggregatedData.length))
-						.rangeBands([0, aggregatedData.length * barHeight]);
-	var y = function(d, i) { return yScale(i); };
-	var yText = function(d, i) { return y(d, i) + yScale.rangeBand() / 2; };
-	var x = d3.scale.linear()
-				.domain([0, d3.max(aggregatedData, barValue)])
-				.range([0, maxBarWidth]);
-	// svg container element
-	barSvg.append("svg")
-	  .attr('width', maxBarWidth + barLabelWidth + valueLabelWidth)
-	  .attr('height', gridLabelHeight + gridChartOffset + aggregatedData.length * barHeight);
-	// grid line labels
-	var gridContainer = barSvg.append('g')
-	  .attr('transform', 'translate(' + barLabelWidth + ',' + gridLabelHeight + ')'); 
-	// vertical grid lines
-	gridContainer.selectAll("line").data(x.ticks(10)).enter().append("line")
-	  .attr("x1", x)
-	  .attr("x2", x)
-	  .attr("y1", 0)
-	  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
-	  .style("stroke", "#ccc");
-	// bar labels
-	var labelsContainer = barSvg.append('g')
-	  .attr('transform', 'translate(' + (barLabelWidth - barLabelPadding) + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
-	labelsContainer.selectAll('text').data(aggregatedData).enter().append('text')
-	  .attr('y', yText)
-	  .attr('stroke', 'none')
-	  .attr('fill', 'black')
-	  .attr("dy", ".35em") // vertical-align: middle
-	  .attr('text-anchor', 'end')
-	  .text(barLabel);
-	// bars
-	var barsContainer = barSvg.append('g')
-	  .attr('transform', 'translate(' + barLabelWidth + ',' + (gridLabelHeight + gridChartOffset) + ')'); 
-	barsContainer.selectAll("rect").data(aggregatedData).enter().append("rect")
-	  .attr('y', y)
-	  .attr('height', yScale.rangeBand())
-	  .attr('width', function(d) { return x(barValue(d)); })
-	  .attr('stroke', 'white')
-	  .attr('fill', 'steelblue');
-	// bar value labels
-	barsContainer.selectAll("text").data(aggregatedData).enter().append("text")
-	  .attr("x", function(d) { return x(barValue(d)); })
-	  .attr("y", yText)
-	  .attr("dx", 3) // padding-left
-	  .attr("dy", ".35em") // vertical-align: middle
-	  .attr("text-anchor", "start") // text-align: right
-	  .attr("fill", "black")
-	  .attr("stroke", "none")
-	  .text(function(d) { return d3.round(barValue(d), 2); });
-	// start line
-	barsContainer.append("line")
-	  .attr("y1", -gridChartOffset)
-	  .attr("y2", yScale.rangeExtent()[1] + gridChartOffset)
-	  .style("stroke", "#000");
-	
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, chartWidth-margin.left-margin.right], .1);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", chartWidth)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
+  x.domain(data.map(function(d) { return d.year; }));
+  y.domain([0, d3.max(data, function(d) { return d.inflation_domestic_income; })]);
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Income");
+
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.year); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.inflation_domestic_income); })
+      .attr("height", function(d) { return height - y(d.inflation_domestic_income); })
+	  .attr('fill', 'lightgrey');
+
+});
 }
-// A function which allows a complete sorting of the bar graph from lowest to highest with the changes of the labels on the x,y axis.
-// var timeOut = setTimeout(function(){filter()}, 200);
-
-// function filter() {
-    // clearTimeout(timeOut);
-
-    // var x0 = x.domain(data.sort(this.checked
-        // ? function(a, b) { return b.values.value - a.values.value; }
-        // : function(a, b) { return d3.ascending(a.key, b.key); })
-        // .map(function(d) { return d.key; }))
-        // .copy();
-
-    // var transition = svg.transition().duration(750),
-        // delay = function(d, i) { return i * 50; };
-
-    // transition.selectAll(".bar")
-        // .delay(delay)
-        // .attr("x", function(d) { return x0(d.key); });
-
-    // transition.select(".x.axis")
-        // .call(xAxis)
-      // .selectAll("g")
-        // .delay(delay);
-  // }
-  
-  
   
 
 /*
