@@ -5,7 +5,7 @@ var moviesDataset;
 var genreDataset;
 
 // csv filenames 
-var files = new Array("1983-2012_movies.csv", "1983-2012_genres.csv");
+var files = new Array("1983-2012_movies.csv", "1983-2012_genre_groups_income_inflation.csv");
 
 // Dimensions for all the components in our vis
 var svg;
@@ -39,14 +39,17 @@ var genres;
 var years = [1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1992, 1993, 1994, 1995, 1996,
              1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
              2012];
+             
+var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#818181", "#bfe3e1", "#89739E", "#DE76A1",
+                   "#454269", "#D8C0EB", "#FAC8E8", "#7CB360", "#BFBFBF", "#9E5D5D", "#E8C387"];
 var currYear = years[years.length-1];
 
 // Represent Jan and Dec, respectively
-var startMonth = 0; 
+var startMonth = 11; 
 var endMonth = 11;
 
 // Represent first and last day of the month, respectively
-var startDay = 1; 
+var startDay = 15; 
 var endDay = 31; // Because year ends with December, we use 31st
 
 var startDate = "2013-01-01";
@@ -133,7 +136,7 @@ function loadData(filename){
             console.log(error);
         }
         else{
-            console.log(data);  //DEBUG: delete this later...     
+            //console.log(data);  //DEBUG: delete this later...     
             if (filename == files[0]) {
             	setupLayout();
             	moviesDataset = data;
@@ -260,7 +263,7 @@ function generateBubbleGraph(){
 	*/
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
-							.domain([new Date(currYear, startMonth, startDay), new Date(currYear, endMonth, endDay)])
+							.domain([new Date(currYear - 1, 11, 15), new Date(currYear, endMonth, endDay)])
         					.range([scaleOffset, chartWidth - scaleOffset]);
         			
     var bubbleYScale = d3.scale.linear()
@@ -271,7 +274,8 @@ function generateBubbleGraph(){
 	var bubbleXAxis = d3.svg.axis()
 						.scale(bubbleXScale)
 						.orient("bottom")
-						.tickFormat(d3.time.format("%b"));
+						.tickFormat(d3.time.format("%b"))
+						.tickSize(0);
 				
 	var bubbleYAxis = d3.svg.axis()
 						.scale(bubbleYScale)
@@ -298,14 +302,30 @@ function generateBubbleGraph(){
 		.attr("x", -(chartHeight) / 2)
         .attr("y", -axisLabelMargin)
         .text(determineCurrentLabel());	
-        
+  
+    var circles = bubbleSvg.append("g")
+    					.selectAll("circle")
+    					.data(genreColors)
+    					.enter()
+    					.append("circle");   
+    					
+    	circles.attr("cx", function(d, i) {
+				return i * 25 +100; 
+			})
+			.attr("cy", 10)
+			.attr("r", radius)
+			.attr("fill", function (d, i) {
+				return genreColors[i];
+			});  
+			
 	var bubbles = bubbleSvg.append("g")
 						.attr("class", "bubbles")
 						.selectAll("circle")
 						.data(moviesDataset)
 						.enter()
 						.append("circle");
-	
+
+			
 	bubbles.attr("cx", function(d) {
 				if (d.production_year == currYear) {
 					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
@@ -320,7 +340,13 @@ function generateBubbleGraph(){
 			})
 			.attr("r", radius)
 			.attr("fill", function (d) {
-				return color(d.genre1);
+				return genreColors[parseInt(d.genre1_index)];
+			})
+			.attr("stroke", function (d) {
+				if (d.genre2_index != "") {
+					return genreColors[parseInt(d.genre2_index)];//color(d.genre2);
+				}
+				return genreColors[parseInt(d.genre1_index)];
 			})
 			.on("mouseover", function(d) { 
             	d3.select(this.parentNode)
@@ -350,12 +376,6 @@ function generateBubbleGraph(){
                	currAdjustedIncome = "";
                	removeDetails();
             })
-			.attr("stroke", function (d) {
-				if (d.genre2 != "") {
-					return color(d.genre2);
-				}
-				return color(d.genre1);
-			})
 			.attr("stroke-width", stroke)
 			.attr("opacity", function (d) {
 				if (d.production_year != currYear){
