@@ -2,10 +2,10 @@
 var moviesDataset;
 
 // Contains genre data for the top 25 movies from 1983-2012
-var genreDataset;
+var genreGroupsIncomeDataset, genreGroupsIncomeInflationDataset;
 
-// csv filenames 
-var files = new Array("1983-2012_movies.csv", "1983-2012_genre_groups_income_inflation.csv");
+// CSV filenames 
+var files = new Array("1983-2012_movies.csv", "1983-2012_genre_groups_income.csv", "1983-2012_genre_groups_income_inflation.csv");
 
 // Dimensions for all the components in our vis
 var svg;
@@ -32,7 +32,7 @@ var color = d3.scale.category20();
 
 // Linechart Variables
 // once data is imported, will map genre name to values (.year and .count)
-var genres;
+var genreGroupsIncome, genreGroupsIncomeInflation;
 
 // Bubblechart variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +44,7 @@ var genreNames = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Docume
 				  "Fantasy", "Horror", "Musical", "Romance", "Sci-Fi", "Thriller", "War", 
 				  "Western"];
              
-var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#FAAC3E", "#bfe3e1", "#89739E", "#DE76A1",
+var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#FAAC3E", "#BFE3E1", "#89739E", "#DE76A1",
                    "#454269", "#D8C0EB", "#FAC8E8", "#7CB360", "#BFBFBF", "#9E5D5D", "#E8C387"];
                    
 //var genreList = [""]
@@ -81,13 +81,16 @@ var stroke = 4;
 var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Comedy, Musical", 
 					   "Horror, Fantasy, Sci-Fi", "Drama, Romance, War", "Documentary"];
 					   
-var genreGroupColors = ["#D63E3F", "#65B5F7", "#F5EA58", "#bfe3e1", "#89739E", "#454269"];
+var genreGroupColors = ["#D63E3F", "#65B5F7", "#F5EA58", "#454269", "#89739E", "#BFE3E1"];
 
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
 
-var currDistributor, currRating, currGenre, currTitle, currBudget, currIncome, currAdjustedIncome;
+// Variables used for details on demand 
+// These are set when hovering over a point on the line graph or a movie in the bubble graph
+var year, currDistributor, currRating, currGenre, currTitle, currBudget, currIncome, currAdjustedIncome;
+
 
 /*
  * We have referenced this code from https://gist.github.com/trtg/3922684
@@ -138,7 +141,7 @@ function setupLayout(){
 
 loadData(files[0]);
 loadData(files[1]);
-
+loadData(files[2]);
 
 /*
  * Prepares the data so it can be manipulated in
@@ -150,29 +153,46 @@ function loadData(filename){
             console.log(error);
         }
         else{
-            //console.log(data);  //DEBUG: delete this later...     
+            console.log(data);  //DEBUG: delete this later...     
             if (filename == files[0]) {
             	setupLayout();
             	moviesDataset = data;
             	generateBubbleGraph();
             	generateDetails();
-            	barGraph();
             	
             }  
-            else {
-            	genresDataset = data;
+            else if (filename == files[1]) {
+            	genreGroupsIncomeDataset = data;
+            	
             	// adapted example from http://bl.ocks.org/mbostock/3884955
 	            color.domain(d3.keys(data[0]).filter(function(key) { return key !== "year"; }));
 	            
-	            genres = color.domain().map(function(name) {
+	            genreGroupsIncome = d3.keys(data[0]).filter(function(key) { return key !== "year"; })
+	            			.map(function(name) {
 							    return {
 							      name: name,
 							      values: data.map(function(d) {
-							        return { year: d.year, count: +d[name]};
+							        return { year: d.year, income: +d[name]};
 							      })
 							    };
 							  });
 							  
+            }
+            
+            else {
+            	
+            	genreGroupsIncomeInflationDataset = data;
+            	            	
+            	genreGroupsIncomeInflation = d3.keys(data[0]).filter(function(key) { return key !== "year"; })
+	            			.map(function(name) {
+							    return {
+							      name: name,
+							      values: data.map(function(d) {
+							        return { year: d.year, income: +d[name]};
+							      })
+							    };
+							  });
+											  
             	generateLineGraph();
             	generateSidePanel();
             }
@@ -206,7 +226,7 @@ function generateDetails() {
 
 /*
  * Displays the key for both the bubble and line charts.
- * @author Annette Almonte 
+ * @author ajam 
  */
 function displayLegend() {
 	
@@ -217,7 +237,7 @@ function displayLegend() {
 /*
  * Creates the color swatches and corresponding text for 
  * the bubble chart key.
- * @author Annette Almonte
+ * @author ajam
  */
 function displayBubbleChartKey(){
 	
@@ -268,7 +288,7 @@ function displayColorSwatch(index, cx, cy, radius, fill) {
 /*
  * Creates the color swatches and corresponding text for 
  * the line chart key.
- * @author Annette Almonte
+ * @author ajam
  */
 function displayLineChartKey() {
 	
@@ -325,7 +345,7 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
 /*
  * Displays the data pertaining to a movie when a user
  * hovers over a bubble.
- * @author Annette Almonte 
+ * @author ajam 
  */
 function displayDetails() {
 	
@@ -354,7 +374,7 @@ function displayDetails() {
 
 /*
  * Function used to add the text for the DoD.
- * @author Annette Almonte 
+ * @author ajam 
  */
 function addText(classAttr, x, y, textAnchor, text) {
     detailsSvg.append("svg:text")
@@ -367,7 +387,7 @@ function addText(classAttr, x, y, textAnchor, text) {
 
 /*
  * Removes the data displayed in the DoD area.
- * @author Annette Almonte
+ * @author ajam
  */
 function removeDetails(className) {
 	detailsSvg.selectAll(className).remove();
@@ -407,7 +427,7 @@ function generateBubbleGraph(){
 		.append("text")
 		.attr("text-anchor","middle")
 		.attr("x", (chartWidth - scaleOffset) / 2)
-		.attr("y", axisLabelMargin)
+		.attr("y", axisLabelMargin - 12)
 		.text("Movie Release Date");
 	
 	bubbleSvg.append("g")
@@ -495,7 +515,7 @@ function generateBubbleGraph(){
  * Determines the label for the y-axes based on what mode (adjusted income or
  * actual domestic income) the user is in.
  * 
- * @author Annette Almonte
+ * @author ajam
  */      
 function determineCurrentLabel() {
 	if (indexCurrYValue == 0) {
@@ -508,9 +528,7 @@ function determineCurrentLabel() {
  * Updates bubble graph to display current selected year
  */
 function updateBubbleGraph() {
-	
 	bubbleSvg.selectAll("g").remove();
-	
 	generateBubbleGraph();
 }
 
@@ -587,19 +605,20 @@ d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
 function generateLineGraph(){
 	
 	// setup axis scales
-	var maxGenreCount = 15;
+	var maxIncome = 3000000000;
+	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
+	
 	var lineXScale = d3.scale.linear()
         					.domain([years[0],years[years.length-1]])
         					.range([scaleOffset, chartWidth - scaleOffset]);
 
     var lineYScale = d3.scale.linear()
-    						.domain([maxGenreCount,0])
+    						.domain([maxIncome,0])
     						.range([scaleOffset, chartHeight - scaleOffset]);
     						
 	var line = d3.svg.line()
-				    //.interpolate("basis") // gives line smooth curves
 				    .x(function(d) { return lineXScale(d.year); })
-				    .y(function(d) { return lineYScale(d.count); });
+				    .y(function(d) { return lineYScale(d.income); });
     
     
 	// draw axes
@@ -607,12 +626,13 @@ function generateLineGraph(){
 						.scale(lineXScale)
 						.orient("bottom")
 						.ticks(30)
-						.tickFormat(d3.format(".0f"));
+						.tickFormat(d3.format("f"));
 				
 	var lineYAxis = d3.svg.axis()
 						.scale(lineYScale)
 						.orient("left")
-						.ticks(8);
+						.ticks(8)
+						.tickFormat(d3.format(",.2s"));
 				
 	lineSvg.append("g")
 				.attr("class", "axis")
@@ -633,22 +653,26 @@ function generateLineGraph(){
 					.attr("text-anchor","middle")
 					.attr("x", -(chartHeight) / 2)
 			        .attr("y", -axisLabelMargin)
-			        .text("Number of Movies in Top 25");
+			        .text(determineCurrentLabel());
 			        
 			        
 	// draw lines
 	var genreLines = lineSvg.selectAll(".genreLine")
-					      	.data(genres)
-					    	.enter()
-					    	.append("g")
-					      	.attr("class", "genreLine");
+						      	.data(function() { if(indexCurrYValue == 0) 
+						      							return genreGroupsIncomeInflation;
+			      									else 
+			      										return genreGroupsIncome; })
+						    	.enter()
+						    	.append("g")
+						      	.attr("class", "genreLine");
+	
 						      	
 	genreLines.append("path")
 		  .attr("id", function(d) { return d.name.concat("Line"); })
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
 	      .on("mouseover", function(d) { 
-	      	highlightLine(d3.select(this)); 
+	      	highlightLine(d3.select(this));
 	      })
 	      .on("mouseout", function(d) { 
 	      	unhighlightLine(d3.select(this)); 
@@ -658,48 +682,51 @@ function generateLineGraph(){
 	      .style("fill","none")
 	      .append("title")
           .text(function(d) { return d.name;});
-     
-    // create dots on data points (one per genre per year) 
-    // these will appear on a line when the data point on the line is hovered over
-
-    var genreNames = d3.keys(genresDataset[0]).filter(function(key) { return key !== "year"; });
     
-    //var genrePoints = lineSvg.append("g")
-    //						.attr("class", "genrePoints");
- 
-	for (var n in genreNames) {
-		var genreName = genreNames[n];
-		var idName = genreName.concat("Point");
-	    var genrePoints = lineSvg.append("g")
-	    			.attr("id", idName.concat("s"))
-	    			.attr("class", "genrePoint");
-		
-		genrePoints.selectAll("circle")
-			      	.data(genresDataset)
-			    	.enter()
-			    	.append("circle")
-			    	.attr("id", function(d) { return d.year.toString().concat(idName); })
-			      	.attr("class", "point")
-			      	.attr("cx", function(d) { return lineXScale(d.year); })
-					.attr("cy", function(d) { return lineYScale(d[genreName]); })
-					.attr("r", 6)
-					.on("mouseover", function(d) {
-						highlightPoint(this); 
-					})
-					.on("mouseout", function(d) { 
-						unhighlightPoint(this); 
-					})
-					.on("click", function(d) { currYear = d.year; 
-												updateBubbleGraph(); })
-	 				.attr("opacity", 0.0)
-	 				.style("stroke", function(d) { return color(genreName); })
-	 				.style("stroke-width", 2)
-					.style("fill", "white")
-					.append("title")
-					.text(function(d) { return d.year.concat("\n",genreName," : ",d[genreName]); });
-		
-		d3.selectAll(".genrePoint").moveToFront();
-	}
+    // add circles to data points on each line
+    // these will appear when the data point on the line is hovered over      
+    genreLines.each(
+    	function (d) { 
+    		var genreName = d.name;
+    		var thisLine = d3.select(this).select("path");
+			d3.select(this)
+				.append("g")
+				.attr("class", "genrePoints")
+				.selectAll("circle")
+				.data(function() { if(indexCurrYValue == 0) 
+	      								return genreGroupsIncomeInflationDataset;
+									else 
+										return genreGroupsIncomeDataset; 
+								})
+				.enter()
+				.append("circle")
+				.attr("id", function(d) { return d.year.toString().concat(genreName,"Point"); })
+		      	.attr("class", "point")
+		      	.attr("cx", function(d) { return lineXScale(d.year); })
+				.attr("cy", function(d) { return lineYScale(d[genreName]); })
+				.attr("r", 5)
+				.on("mouseover", function(d) {
+					year = d.year;
+					currGenre = "Genres: " + genreName;
+					currIncome = "Income: $" + d[genreName];
+					highlightPoint(this);
+					highlightLine(thisLine);
+				})
+				.on("mouseout", function(d) { 
+					unhighlightPoint(this);
+					unhighlightLine(thisLine);
+				})
+				.on("click", function(d) { currYear = d.year; 
+											updateBubbleGraph(); 
+				})
+ 				.attr("opacity", 0.0)
+ 				.style("stroke", function(d) { return color(genreName); })
+ 				.style("stroke-width", 2)
+				.style("fill", "white");
+		}
+	);
+					
+	d3.selectAll(".point").moveToFront();
 
 }
 
@@ -716,7 +743,7 @@ function highlightLine(o) {
 	o.attr("opacity", 1.0)
 		.style("stroke-width",4);
 			
-	d3.selectAll(".genrePoint").moveToFront();
+	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -729,7 +756,7 @@ function unhighlightLine(o) {
 	    
 	o.style("stroke-width",2);
 		
-	d3.selectAll(".genrePoint").moveToFront();
+	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -738,13 +765,10 @@ function unhighlightLine(o) {
 function highlightPoint(o) {
 	d3.select(o)
 		.attr("opacity", 1.0);
-	
-	var p = "#";
-	var lineId = p.concat(d3.select(o.parentNode).attr("id").replace("Points","Line"));
-	var line = d3.select(lineId);
-	highlightLine(line);
+
+	displayPointDetails();
 	      		
-	d3.selectAll(".genrePoint").moveToFront();
+	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -754,11 +778,34 @@ function highlightPoint(o) {
 function unhighlightPoint(o) {
 	d3.select(o)
 		.attr("opacity", 0.0);
-	
-	var p = "#";
-	var lineId = p.concat(d3.select(o.parentNode).attr("id").replace("Points","Line"));
-	var line = d3.select(lineId);
-	unhighlightLine(line);
+		
+	removeDetails();
 	        
-	d3.selectAll(".genrePoint").moveToFront();
+	d3.selectAll(".point").moveToFront();
 }
+
+/*
+ * Displays the data pertaining to a genre group when a user
+ * hovers over a point on a line.
+ */
+function displayPointDetails() {
+	detailsSvg.append("svg:text")
+    			.attr("x", detailsWidth / 2)
+				.attr("y", 40)
+        		.attr("text-anchor", "middle")
+        		.text(year);
+        	   	
+    detailsSvg.append("svg:text")
+        	   	.attr("x", detailsWidth / 2)
+        	   	.attr("y", 80)
+        	   	.attr("text-anchor", "middle")
+        	   	.text(currGenre);
+        	   	
+    detailsSvg.append("svg:text")
+        	   	.attr("x", detailsWidth / 2)
+        	   	.attr("y", 120)
+        	   	.attr("text-anchor", "middle")
+        	   	.text(currIncome);        	   	
+        	   	       	        	   	       	
+}
+
