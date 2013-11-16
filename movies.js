@@ -39,9 +39,15 @@ var genres;
 var years = [1983, 1984, 1985, 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1992, 1993, 1994, 1995, 1996,
              1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
              2012];
+
+var genreNames = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", 
+				  "Fantasy", "Horror", "Musical", "Romance", "Sci-Fi", "Thriller", "War", 
+				  "Western"];
              
 var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#FAAC3E", "#bfe3e1", "#89739E", "#DE76A1",
                    "#454269", "#D8C0EB", "#FAC8E8", "#7CB360", "#BFBFBF", "#9E5D5D", "#E8C387"];
+                   
+//var genreList = [""]
 var currYear = years[years.length-1];
 
 // Represent Jan and Dec, respectively
@@ -69,7 +75,14 @@ var axisLabelWidth = 50;
 // Radius of a bubble
 var radius = 7;
 var stroke = 4;
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Comedy, Musical", 
+					   "Horror, Fantasy, Sci-Fi", "Drama, Romance, War", "Documentary"];
+					   
+var genreGroupColors = ["#D63E3F", "#65B5F7", "#F5EA58", "#bfe3e1", "#89739E", "#454269"];
+
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
@@ -180,89 +193,192 @@ function generateSidePanel() {
  * Creates the details-on-demand space.
  */
 function generateDetails() {
+	
 	detailsSvg.append("rect")
 					.attr("x", "0")
 					.attr("y", "0")
 					.attr("width", detailsWidth)
 					.attr("height", detailsHeight)
 					.attr("fill", "rgb(240,240,240)");
+	
+	displayLegend();
 }
 
+/*
+ * Displays the key for both the bubble and line charts.
+ * @author Annette Almonte 
+ */
+function displayLegend() {
+	
+	displayBubbleChartKey();
+	displayLineChartKey();
+}
+
+/*
+ * Creates the color swatches and corresponding text for 
+ * the bubble chart key.
+ * @author Annette Almonte
+ */
+function displayBubbleChartKey(){
+	
+	var xOffset = 20;
+	var yOffset = 20;
+	var xSpacing = 125;//150;
+	var ySpacing = 28;
+	
+	var vertBubbleOffset = 2;
+	
+	var rows = 4;
+	var cols = 4;
+	
+	detailsSvg.append("svg:g")
+				.attr("class", "legend")
+	    		.selectAll("circle")
+				.data(genreNames)
+				.enter()
+				.append("circle")
+				.attr("id", function(d, i) {
+					return "colorSwatch" + String(i);
+				});
+
+	var count = 0;
+	for (var i = 0; i < cols; i++) {
+		for (var j = 0; j < rows; j++) {
+			displayColorSwatch(count, i * xSpacing + xOffset, j * ySpacing + yOffset * 2 - radius + vertBubbleOffset, 
+							   radius, genreColors[count]);
+			addText("legend", i * xSpacing + xOffset * 2, j * ySpacing + yOffset * 2, "start", genreNames[count]);
+			count++;
+		}
+	}	
+}
+
+/*
+ * Creates a color swatch for the bubble chart key.
+ */
+function displayColorSwatch(index, cx, cy, radius, fill) {
+	
+	detailsSvg.select("#colorSwatch" + String(index))
+	    		.attr("cx", cx)
+	    		.attr("cy", cy)
+	    		.attr("r", radius + 2)
+	    		.attr("fill", fill);
+	
+}
+
+/*
+ * Creates the color swatches and corresponding text for 
+ * the line chart key.
+ * @author Annette Almonte
+ */
+function displayLineChartKey() {
+	
+	detailsSvg.append("svg:g")
+				.attr("class", "legend")
+	    		.selectAll("line")
+				.data(genreGroupNames)
+				.enter()
+				.append("line")
+				.attr("id", function(d, i) {
+					return "lineSwatch" + String(i);
+				});
+				
+	var xOffset = 545;
+	var yOffset = 20;
+	var horizTextOffset = 5;
+	var vertOffset = 3;
+	var xSpacing = 285;
+	var ySpacing = 28;
+	
+	var rows = 4;
+	var cols = 2;
+	
+	var lineLength = 30;
+	
+	var count = 0;
+	for (var i = 0; i < cols; i++) {
+		for (var j = 0; j < rows; j++) {
+			var x = i * xSpacing + xOffset;
+			var y = j * ySpacing + yOffset * 2 - radius + vertOffset;
+			displayLineSwatch(count, x, y, x + lineLength, y, genreGroupColors[count]);
+			addText("legend", i * xSpacing + xOffset + lineLength + horizTextOffset, j * ySpacing + yOffset * 2, "start", genreGroupNames[count]);
+			count++;
+		}
+	}
+}
+
+
+/*
+ * Creates a line swatch for the line graph key.
+ * @author ajam
+ */
+function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
+	
+	detailsSvg.select("#lineSwatch" + String(index))
+				.attr("x1", x1)
+				.attr("y1", y1)
+				.attr("x2", x2)
+				.attr("y2", y2)
+				.attr("stroke", stroke)
+				.attr("stroke-width", 5);
+}
 
 /*
  * Displays the data pertaining to a movie when a user
  * hovers over a bubble.
+ * @author Annette Almonte 
  */
 function displayDetails() {
-	detailsSvg.append("svg:text")
-    			.attr("x", 20)
-				.attr("y", 40)
-        		.attr("text-anchor", "start")
-        		.text(currDistributor)
+	
+	var xOffset = 20;
+	
+	// Represents the left, middle, and rightmost columns in the DOD space
+	var xPos = [xOffset, detailsWidth / 2, detailsWidth - xOffset];
+	
+	// Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
+	var yPos = [40, 80, 120]; 
+	
+	var xAlign = ["start", "middle", "end"];
+	
+	addText("leftColumn details", xPos[0], yPos[0], xAlign[0], currDistributor);
+	addText("leftColumn details", xPos[0], yPos[1], xAlign[0], currRating);
+	addText("leftColumn details", xPos[0], yPos[2], xAlign[0], currGenre);
         		
-    detailsSvg.append("svg:text")
-        	   	.attr("x", 20)
-        	   	.attr("y", 80)
-        	   	.attr("text-anchor", "start")
-        	   	.text(currRating);
+	addText("middleColumn details title", xPos[1], yPos[1], xAlign[1], currTitle);
         	   	
-    detailsSvg.append("svg:text")
-        	   	.attr("x", 20)
-        	   	.attr("y", 120)
-        	   	.attr("text-anchor", "start")
-        	   	.text(currGenre);
-        	   	
-    detailsSvg.append("svg:text")
-    			.attr("class", "movieTitle")
-        	   	.attr("x", detailsWidth / 2)
-        	   	.attr("y", 80)
-        	   	.attr("text-anchor", "middle")
-        	   	.text(currTitle); 
+	addText("rightColumn details", xPos[2], yPos[0], xAlign[2], currDistributor);
+	addText("rightColumn details", xPos[2], yPos[1], xAlign[2], currIncome);
+	addText("rightColumn details", xPos[2], yPos[2], xAlign[2], currAdjustedIncome);       	   	
+	      	   	       	        	   	       	
+}
 
-    detailsSvg.append("svg:text")
-        	   	.attr("x", detailsWidth - 20)
-        	   	.attr("y", 40)
-        	   	.attr("text-anchor", "end")
-        	   	.text(currBudget);
 
+/*
+ * Function used to add the text for the DoD.
+ * @author Annette Almonte 
+ */
+function addText(classAttr, x, y, textAnchor, text) {
     detailsSvg.append("svg:text")
-        	   	.attr("x", detailsWidth - 20)
-        	   	.attr("y", 80)
-        	   	.attr("text-anchor", "end")
-        	   	.text(currIncome);
-
-    detailsSvg.append("svg:text")
-        	   	.attr("x", detailsWidth - 20)
-        	   	.attr("y", 120)
-        	   	.attr("text-anchor", "end")
-        	   	.text(currAdjustedIncome);        	   	
-        	   	       	        	   	       	
+    			.attr("class", classAttr)
+        	   	.attr("x", x)
+        	   	.attr("y", y)
+        	   	.attr("text-anchor", textAnchor)
+        	   	.text(text);  	
 }
 
 /*
  * Removes the data displayed in the DoD area.
+ * @author Annette Almonte
  */
-function removeDetails() {
-	detailsSvg.selectAll("text").remove();
+function removeDetails(className) {
+	detailsSvg.selectAll(className).remove();
 }
+
+
 /*
  * Generates the bubble chart. 
  */
 function generateBubbleGraph(){
-	/*
-	svg = d3.select("body")
-			.append("svg")
-			.attr("class", "visualization")
-			.attr("width", svgWidth)
-			.attr("height", svgHeight);
-				
-	bubbleSvg = svg.append("svg")
-					.attr("id", "bubbleChart")
-					.attr("x", "0")
-					.attr("y", "0")
-					.attr("width", chartWidth)
-					.attr("height", totalChartHeight);
-	*/
+
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear - 1, 11, 15), new Date(currYear, endMonth, endDay)])
@@ -303,22 +419,7 @@ function generateBubbleGraph(){
 		.attr("transform","rotate(-90)")
 		.attr("x", -(chartHeight) / 2)
         .attr("y", -axisLabelMargin)
-        .text(determineCurrentLabel());	
-  
-    var circles = bubbleSvg.append("g")
-    					.selectAll("circle")
-    					.data(genreColors)
-    					.enter()
-    					.append("circle");   
-    					
-    	circles.attr("cx", function(d, i) {
-				return i * 25 +100; 
-			})
-			.attr("cy", 10)
-			.attr("r", radius)
-			.attr("fill", function (d, i) {
-				return genreColors[i];
-			});  
+        .text(determineCurrentLabel());	     					 
 			
 	var bubbles = bubbleSvg.append("g")
 						.attr("class", "bubbles")
@@ -351,6 +452,8 @@ function generateBubbleGraph(){
 				return genreColors[parseInt(d.genre1_index)];
 			})
 			.on("mouseover", function(d) { 
+				removeDetails("g.legend");
+				removeDetails("text.legend");
             	d3.select(this.parentNode)
                 	.selectAll("circle")
                     .attr("opacity", 0.5);
@@ -366,6 +469,7 @@ function generateBubbleGraph(){
                	displayDetails();
             })
             .on("mouseout", function(d) { 
+            	displayLegend();
                 d3.select(this.parentNode)
                 	.selectAll("circle")
                     .attr("opacity", 1.0);
@@ -376,7 +480,7 @@ function generateBubbleGraph(){
                	currBudget = "";
                	currIncome = "";
                	currAdjustedIncome = "";
-               	removeDetails();
+               	removeDetails("text.details");
             })
 			.attr("stroke-width", stroke)
 			.attr("opacity", function (d) {
