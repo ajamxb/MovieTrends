@@ -4,8 +4,11 @@ var moviesDataset;
 // Contains genre data for the top 25 movies from 1983-2012
 var genreGroupsIncomeDataset, genreGroupsIncomeInflationDataset;
 
+// Contains total incomes from 1983-2012
+var totalIncomeDataset;
+
 // CSV filenames 
-var files = new Array("1983-2012_movies.csv", "1983-2012_genre_groups_income.csv", "1983-2012_genre_groups_income_inflation.csv");
+var files = new Array("1983-2012_movies.csv", "1983-2012_movies_totalincomes.csv", "1983-2012_genre_groups_income.csv", "1983-2012_genre_groups_income_inflation.csv");
 
 // Dimensions for all the components in our vis
 var svg;
@@ -78,10 +81,10 @@ var stroke = 4;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Comedy, Musical", 
-					   "Horror, Fantasy, Sci-Fi", "Drama, Romance, War", "Documentary"];
+var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Horror, Fantasy, Sci-Fi", 
+					   "Comedy, Musical", "Drama, Romance, War", "Documentary"];
 					   
-var genreGroupColors = ["#D63E3F", "#65B5F7", "#F5EA58", "#454269", "#89739E", "#BFE3E1"];
+var genreGroupColors = ["#D63E3F", "#65B5F7", "#454269", "#F5EA58", "#89739E", "#BFE3E1"];
 
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
@@ -116,21 +119,22 @@ function setupLayout(){
 			
 
 	lineSvg = svg.append("svg")
-						//.attr("id", "lineChart")
+						.attr("id", "lineChart")
 						.attr("x", "0")
 						.attr("y", 0)
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
+						
 	detailsSvg = svg.append("svg")
-						//.attr("id", "details")
+						.attr("id", "details")
 						.attr("x", "0")
 						.attr("y", chartHeight)
 						.attr("width", detailsWidth)
 						.attr("height", detailsHeight)
 
 	bubbleSvg = svg.append("svg")
-						//.attr("id", "bubbleChart")
+						.attr("id", "bubbleChart")
 						.attr("x", "0")
 						.attr("y", (chartHeight + detailsHeight))
 						.attr("width", chartWidth)
@@ -141,8 +145,9 @@ function setupLayout(){
 }
 
 loadData(files[0]);
-loadData(files[1]);
+loadData(files[1])
 loadData(files[2]);
+loadData(files[3]);
 
 /*
  * Prepares the data so it can be manipulated in
@@ -163,6 +168,9 @@ function loadData(filename){
             	
             }  
             else if (filename == files[1]) {
+            	totalIncomeDataset = data;
+            }
+            else if (filename == files[2]) {
             	genreGroupsIncomeDataset = data;
             	
             	// adapted example from http://bl.ocks.org/mbostock/3884955
@@ -360,16 +368,18 @@ function displayDetails() {
 	
 	var xAlign = ["start", "middle", "end"];
 	
-	addText("leftColumn details", xPos[0], yPos[0], xAlign[0], currDistributor);
-	addText("leftColumn details", xPos[0], yPos[1], xAlign[0], currRating);
-	addText("leftColumn details", xPos[0], yPos[2], xAlign[0], currGenre);
+	var leftColText = [currDistributor, currRating, currGenre];
+	var rightColText = [currBudget, currIncome, currAdjustedIncome];
+	
+	for (var i = 0; i < yPos.length; i++) {
+		addText("leftColumn details", xPos[0], yPos[i], xAlign[0], leftColText[i]);	
+	}
         		
 	addText("middleColumn details title", xPos[1], yPos[1], xAlign[1], currTitle);
-        	   	
-	addText("rightColumn details", xPos[2], yPos[0], xAlign[2], currDistributor);
-	addText("rightColumn details", xPos[2], yPos[1], xAlign[2], currIncome);
-	addText("rightColumn details", xPos[2], yPos[2], xAlign[2], currAdjustedIncome);       	   	
-	      	   	       	        	   	       	
+     
+   	for (var i = 0; i < yPos.length; i++) {
+		addText("rightColumn details", xPos[2], yPos[i], xAlign[2], rightColText[i]);	
+	}   	   	    	   		      	   	       	        	   	       	
 }
 
 /*
@@ -388,10 +398,11 @@ function displayPointDetails() {
 	
 	var xAlign = ["start", "middle", "end"];
 	
-	addText("middleColumn details", xPos[1], yPos[0], xAlign[1], year);
-	addText("middleColumn details", xPos[1], yPos[1], xAlign[1], currGenre);
-	addText("middleColumn details", xPos[1], yPos[2], xAlign[1], currIncome);       	   	
-        	   	       	        	   	     
+	var middleColText = [year, currGenre, currIncome];
+	
+   	for (var i = 0; i < yPos.length; i++) {
+		addText("middleColumn details", xPos[1], yPos[i], xAlign[1], middleColText[i]);	
+	}	
 }
 
 
@@ -506,9 +517,9 @@ function generateBubbleGraph(){
                	currRating = "Rating: " + d.rating;
                	currGenre = "Genre: " + d.genre;
                	currTitle = d.title;
-               	currBudget = "Production Budget: $" + d.production_budget;
-               	currIncome = "Domestic Income: $" + d.domestic_income;
-               	currAdjustedIncome = "Adjusted Income: $" + d.inflation_domestic_income;
+               	currBudget = "Production Budget: " + d.formatted_production_budget;
+               	currIncome = "Domestic Income: " + d.formatted_domestic_income;
+               	currAdjustedIncome = "Adjusted Income: " + d.formatted_inflation_domestic_income;
                	displayDetails();
             })
             .on("mouseout", function(d) { 
