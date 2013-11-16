@@ -639,7 +639,7 @@ d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
 function generateLineGraph(){
 	
 	// setup axis scales
-	var maxIncome = 3000000000;
+	var maxIncome = 6500000000;
 	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
 	
 	var lineXScale = d3.scale.linear()
@@ -689,13 +689,33 @@ function generateLineGraph(){
 			        .attr("y", -axisLabelMargin)
 			        .text(determineCurrentLabel());
 			        
+	var barWidth = 25;
+			        
+	var bars = lineSvg.selectAll("rect")
+						.data(totalIncomeDataset)
+						.enter()
+						.append("rect")
+						.attr("class", "bar")
+						.attr("x", function(d) {
+							return lineXScale(d.year) - barWidth / 2;
+						})
+						.attr("y", function(d) {
+							return lineYScale(d.inflation_domestic_income);
+						})
+						.attr("width", barWidth)
+						.attr("height", function(d) {
+							return chartHeight - scaleOffset - lineYScale(d.inflation_domestic_income);
+						})
+						.attr("fill", "#d3d3d3");
+								        
 			        
 	// draw lines
 	var genreLines = lineSvg.selectAll(".genreLine")
-						      	.data(function() { if(indexCurrYValue == 0) 
-						      							return genreGroupsIncomeInflation;
-			      									else 
-			      										return genreGroupsIncome; })
+						      	.data(function() { 
+						      			if(indexCurrYValue == 0) 
+						      				return genreGroupsIncomeInflation;
+			      						else 
+			      							return genreGroupsIncome; })
 						    	.enter()
 						    	.append("g")
 						      	.attr("class", "genreLine");
@@ -727,11 +747,12 @@ function generateLineGraph(){
 				.append("g")
 				.attr("class", "genrePoints")
 				.selectAll("circle")
-				.data(function() { if(indexCurrYValue == 0) 
-	      								return genreGroupsIncomeInflationDataset;
-									else 
-										return genreGroupsIncomeDataset; 
-								})
+				.data(function() { 
+						if(indexCurrYValue == 0) 
+	      					return genreGroupsIncomeInflationDataset;
+						else 
+							return genreGroupsIncomeDataset; 
+				})
 				.enter()
 				.append("circle")
 				.attr("id", function(d) { return d.year.toString().concat(genreName,"Point"); })
