@@ -434,7 +434,7 @@ var xAxis = d3.svg.axis()
 var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left")
-    .ticks(10);
+    .ticks(8);
 
 var svg = d3.select("body").append("svg")
     .attr("width", chartWidth)
@@ -444,7 +444,7 @@ var svg = d3.select("body").append("svg")
 
 d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
   x.domain(data.map(function(d) { return d.year; }));
-  y.domain([0, d3.max(data, function(d) { return d.inflation_domestic_income; })]);
+  y.domain([0, d3.max(data, function(d) { return d.inflation_domestic_income/factor;  })]);
 
   svg.append("g")
       .attr("class", "x axis")
@@ -459,7 +459,7 @@ d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Income");
+      .text("Income per year(in Millions USD)");
 
   svg.selectAll(".bar")
       .data(data)
@@ -467,8 +467,8 @@ d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
       .attr("class", "bar")
       .attr("x", function(d) { return x(d.year); })
       .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.inflation_domestic_income); })
-      .attr("height", function(d) { return height - y(d.inflation_domestic_income); })
+      .attr("y", function(d) { return y(d.inflation_domestic_income/factor); })
+      .attr("height", function(d) { return height - y(d.inflation_domestic_income/factor); })
 	  .attr('fill', 'lightgrey');
 
 });
