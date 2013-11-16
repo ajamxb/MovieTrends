@@ -114,10 +114,11 @@ function setupLayout(){
 				.attr("width", svgWidth)
 				.attr("height", svgHeight);
 			
-	bubbleSvg = svg.append("svg")
-						//.attr("id", "bubbleChart")
+
+	lineSvg = svg.append("svg")
+						//.attr("id", "lineChart")
 						.attr("x", "0")
-						.attr("y", "0")
+						.attr("y", 0)
 						.attr("width", chartWidth)
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
@@ -127,9 +128,9 @@ function setupLayout(){
 						.attr("y", chartHeight)
 						.attr("width", detailsWidth)
 						.attr("height", detailsHeight)
-						.attr("overflow","visible");
-	lineSvg = svg.append("svg")
-						//.attr("id", "lineChart")
+
+	bubbleSvg = svg.append("svg")
+						//.attr("id", "bubbleChart")
 						.attr("x", "0")
 						.attr("y", (chartHeight + detailsHeight))
 						.attr("width", chartWidth)
@@ -371,6 +372,28 @@ function displayDetails() {
 	      	   	       	        	   	       	
 }
 
+/*
+ * Displays the data pertaining to a genre group when a user
+ * hovers over a point on a line.
+ */
+function displayPointDetails() {
+	
+	var xOffset = 20;
+	
+	// Represents the left, middle, and rightmost columns in the DOD space
+	var xPos = [xOffset, detailsWidth / 2, detailsWidth - xOffset];
+	
+	// Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
+	var yPos = [40, 80, 120];
+	
+	var xAlign = ["start", "middle", "end"];
+	
+	addText("middleColumn details", xPos[1], yPos[0], xAlign[1], year);
+	addText("middleColumn details", xPos[1], yPos[1], xAlign[1], currGenre);
+	addText("middleColumn details", xPos[1], yPos[2], xAlign[1], currIncome);       	   	
+        	   	       	        	   	     
+}
+
 
 /*
  * Function used to add the text for the DoD.
@@ -457,7 +480,7 @@ function generateBubbleGraph(){
 			})
 			.attr("cy", function (d) {
 				if (d.production_year == currYear) {
-					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); //bubbleYScale(d.inflation_domestic_income / factor);
+					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
 				}
 				return hiddenCoordinate;
 			})
@@ -467,7 +490,7 @@ function generateBubbleGraph(){
 			})
 			.attr("stroke", function (d) {
 				if (d.genre2_index != "") {
-					return genreColors[parseInt(d.genre2_index)];//color(d.genre2);
+					return genreColors[parseInt(d.genre2_index)];
 				}
 				return genreColors[parseInt(d.genre1_index)];
 			})
@@ -609,7 +632,7 @@ function generateLineGraph(){
 	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
 	
 	var lineXScale = d3.scale.linear()
-        					.domain([years[0],years[years.length-1]])
+        					.domain([years[0] - 1, years[years.length-1] + 1])
         					.range([scaleOffset, chartWidth - scaleOffset]);
 
     var lineYScale = d3.scale.linear()
@@ -625,7 +648,7 @@ function generateLineGraph(){
 	var lineXAxis = d3.svg.axis()
 						.scale(lineXScale)
 						.orient("bottom")
-						.ticks(30)
+						.ticks(15)
 						.tickFormat(d3.format("f"));
 				
 	var lineYAxis = d3.svg.axis()
@@ -706,15 +729,19 @@ function generateLineGraph(){
 				.attr("cy", function(d) { return lineYScale(d[genreName]); })
 				.attr("r", 5)
 				.on("mouseover", function(d) {
+					removeDetails("g.legend");
+					removeDetails("text.legend");
 					year = d.year;
 					currGenre = "Genres: " + genreName;
 					currIncome = "Income: $" + d[genreName];
 					highlightPoint(this);
 					highlightLine(thisLine);
 				})
-				.on("mouseout", function(d) { 
+				.on("mouseout", function(d) {
+					displayLegend(); 
 					unhighlightPoint(this);
 					unhighlightLine(thisLine);
+					removeDetails("text.details");
 				})
 				.on("click", function(d) { currYear = d.year; 
 											updateBubbleGraph(); 
@@ -784,28 +811,5 @@ function unhighlightPoint(o) {
 	d3.selectAll(".point").moveToFront();
 }
 
-/*
- * Displays the data pertaining to a genre group when a user
- * hovers over a point on a line.
- */
-function displayPointDetails() {
-	detailsSvg.append("svg:text")
-    			.attr("x", detailsWidth / 2)
-				.attr("y", 40)
-        		.attr("text-anchor", "middle")
-        		.text(year);
-        	   	
-    detailsSvg.append("svg:text")
-        	   	.attr("x", detailsWidth / 2)
-        	   	.attr("y", 80)
-        	   	.attr("text-anchor", "middle")
-        	   	.text(currGenre);
-        	   	
-    detailsSvg.append("svg:text")
-        	   	.attr("x", detailsWidth / 2)
-        	   	.attr("y", 120)
-        	   	.attr("text-anchor", "middle")
-        	   	.text(currIncome);        	   	
-        	   	       	        	   	       	
-}
+
 
