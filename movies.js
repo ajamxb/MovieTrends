@@ -58,7 +58,7 @@ var startMonth = 11;
 var endMonth = 11;
 
 // Represent first and last day of the month, respectively
-var startDay = 15; 
+var startDay = 25; 
 var endDay = 31; // Because year ends with December, we use 31st
 
 var startDate = "2013-01-01";
@@ -79,6 +79,9 @@ var axisLabelWidth = 50;
 var radius = 7;
 var stroke = 4;
 
+// Width of a bar 
+var barWidth = 25;
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Horror, Fantasy, Sci-Fi", 
@@ -86,6 +89,12 @@ var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation
 					   
 var genreGroupColors = ["#D63E3F", "#65B5F7", "#454269", "#F5EA58", "#89739E", "#BFE3E1"];
 
+var genreColorKeyValue = {"Action, Adventure, Thriller, Crime, Western": "#D63E3F",
+					  "Animation": "#65B5F7",
+					  "Horror, Fantasy, Sci-Fi": "#454269",
+					  "Comedy, Musical": "#F5EA58",
+					  "Drama, Romance, War": "#89739E",
+					  "Documentary": "#BFE3E1"};
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
@@ -145,7 +154,7 @@ function setupLayout(){
 }
 
 loadData(files[0]);
-loadData(files[1])
+loadData(files[1]);
 loadData(files[2]);
 loadData(files[3]);
 
@@ -435,7 +444,7 @@ function generateBubbleGraph(){
 
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
-							.domain([new Date(currYear - 1, 11, 15), new Date(currYear, endMonth, endDay)])
+							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
         					.range([scaleOffset, chartWidth - scaleOffset]);
         			
     var bubbleYScale = d3.scale.linear()
@@ -643,7 +652,7 @@ function generateLineGraph(){
 	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
 	
 	var lineXScale = d3.scale.linear()
-        					.domain([years[0] - 1, years[years.length-1] + 1])
+        					.domain([years[0] - 0.5, years[years.length-1] + 1])
         					.range([scaleOffset, chartWidth - scaleOffset]);
 
     var lineYScale = d3.scale.linear()
@@ -689,7 +698,6 @@ function generateLineGraph(){
 			        .attr("y", -axisLabelMargin)
 			        .text(determineCurrentLabel());
 			        
-	var barWidth = 25;
 			        
 	var bars = lineSvg.selectAll("rect")
 						.data(totalIncomeDataset)
@@ -706,7 +714,11 @@ function generateLineGraph(){
 						.attr("height", function(d) {
 							return chartHeight - scaleOffset - lineYScale(d.inflation_domestic_income);
 						})
-						.attr("fill", "#d3d3d3");
+						.attr("fill", "#d3d3d3")
+						.on("click", function(d) {
+							currYear = d.year;
+							updateBubbleGraph();
+						});
 								        
 			        
 	// draw lines
@@ -731,7 +743,9 @@ function generateLineGraph(){
 	      .on("mouseout", function(d) { 
 	      	unhighlightLine(d3.select(this)); 
 	      })
-	      .style("stroke", function(d) { return color(d.name); })
+	      .style("stroke", function(d) { 
+	      	return genreColorKeyValue[d.name]; 
+	      })
 	      .style("stroke-width", 2)
 	      .style("fill","none")
 	      .append("title")
@@ -779,7 +793,10 @@ function generateLineGraph(){
 											updateBubbleGraph(); 
 				})
  				.attr("opacity", 0.0)
- 				.style("stroke", function(d) { return color(genreName); })
+ 				.style("stroke", function(d, i) { 
+ 					console.log(genreName);
+ 					return genreColorKeyValue[genreName];
+ 				})
  				.style("stroke-width", 2)
 				.style("fill", "white");
 		}
