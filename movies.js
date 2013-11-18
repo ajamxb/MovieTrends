@@ -677,19 +677,6 @@ function generateLineGraph(){
 				    .y(function(d) { return lineYValueScale(d.income); });
     
     
-	// set up axes
-	var lineXAxis = d3.svg.axis()
-						.scale(lineXScale)
-						.orient("bottom")
-						.ticks(15)
-						.tickFormat(d3.format("f"));
-				
-	var lineYAxis = d3.svg.axis()
-						.scale(lineYScale)
-						.orient("left")
-						.ticks(8)
-						.tickFormat(function(d) { return incomeFormat(d / factor); });
-			        
 	// draw bars representing total income for top 25 movies each year
 	var barColor = "#d3d3d3";
 	var barHighlightColor = "#b0b0b0";	        
@@ -743,12 +730,31 @@ function generateLineGraph(){
 							}
 						});
 	
+	// set up axes
+	var lineXAxis = d3.svg.axis()
+						.scale(lineXScale)
+						.orient("bottom")
+						.ticks(15)
+						.tickSize(0)
+						.tickFormat(d3.format("f"));
+				
+	var lineYAxis = d3.svg.axis()
+						.scale(lineYScale)
+						.orient("left")
+						.ticks(8)
+						.tickFormat(function(d) { return incomeFormat(d / factor); });
+			        
 	// draw axes
 	lineSvg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(0," + (chartHeight-axisOffset) + ")")
 				.call(lineXAxis)
-				.append("text")
+				.selectAll("text")
+			    .attr("x", 0)
+			    .attr("y", 5)
+			    .style("text-anchor", "middle");
+			    
+	lineSvg.select(".axis").append("text")
 					.attr("text-anchor","middle")
 					.attr("x", chartWidth / 2)
 					.attr("y", axisLabelMargin - 12)
