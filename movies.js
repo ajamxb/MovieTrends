@@ -67,7 +67,7 @@ var dateFormat = d3.time.format("%Y-%m-%d").parse;
 var indexCurrYValue = 0;
 var yValues = ["inflation_domestic_income", "domestic_income"];
 
-var scaleOffset = 65;
+var axisOffset = 65;
 var axisLabelMargin = 55;
 var axisLabelWidth = 50;
 
@@ -443,12 +443,12 @@ function generateBubbleGraph(){
 	// Setup the scales
 	var bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
-        					.range([scaleOffset, chartWidth - scaleOffset]);
+        					.range([axisOffset, chartWidth - axisOffset]);
         			
     var bubbleYScale = d3.scale.linear()
     						.domain([d3.min(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;}),
     								d3.max(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
-    						.range([chartHeight - scaleOffset, scaleOffset]);
+    						.range([chartHeight - axisOffset, axisOffset]);
     						
 	var bubbleXAxis = d3.svg.axis()
 						.scale(bubbleXScale)
@@ -464,7 +464,7 @@ function generateBubbleGraph(){
 					
 	bubbleSvg.append("g")
 		.attr("class", "axis")
-		.attr("transform", "translate(0," + (chartHeight - scaleOffset) + ")")
+		.attr("transform", "translate(0," + (chartHeight - axisOffset) + ")")
 		.call(bubbleXAxis)
 		.append("text")
 		.attr("text-anchor","middle")
@@ -474,7 +474,7 @@ function generateBubbleGraph(){
 	
 	bubbleSvg.append("g")
 		.attr("class", "axis")
-		.attr("transform", "translate(" + scaleOffset + ", 0)")
+		.attr("transform", "translate(" + axisOffset + ", 0)")
 		.call(bubbleYAxis)
 		.append("text")
 		.attr("text-anchor","middle")
@@ -661,15 +661,20 @@ function generateLineGraph(){
 	// set up axis scales
 	var lineXScale = d3.scale.linear()
         					.domain([years[0] - 0.5, years[years.length-1] + 1])
-        					.range([scaleOffset, chartWidth - scaleOffset]);
+        					.range([axisOffset, chartWidth - axisOffset]);
 
     var lineYScale = d3.scale.linear()
     						.domain([maxIncome,0])
-    						.range([scaleOffset, chartHeight - scaleOffset]);
+    						.range([axisOffset, chartHeight - axisOffset]);
+    						
+    var lineYValueScale = d3.scale.linear()
+    						.domain([maxIncome,0])
+    						.range([axisOffset, chartHeight - axisOffset - 2]);
+    
     						
 	var line = d3.svg.line()
 				    .x(function(d) { return lineXScale(d.year); })
-				    .y(function(d) { return lineYScale(d.income); });
+				    .y(function(d) { return lineYValueScale(d.income); });
     
     
 	// set up axes
@@ -704,7 +709,7 @@ function generateLineGraph(){
 						})
 						.attr("width", barWidth)
 						.attr("height", function(d) {
-							return chartHeight - scaleOffset - lineYScale(d.inflation_domestic_income);
+							return chartHeight - axisOffset - lineYValueScale(d.inflation_domestic_income);
 						})
 						.attr("fill", function(d) {
 							if(d.year == currYear) return barHighlightColor;
@@ -741,7 +746,7 @@ function generateLineGraph(){
 	// draw axes
 	lineSvg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(0," + (chartHeight-scaleOffset) + ")")
+				.attr("transform", "translate(0," + (chartHeight-axisOffset) + ")")
 				.call(lineXAxis)
 				.append("text")
 					.attr("text-anchor","middle")
@@ -751,7 +756,7 @@ function generateLineGraph(){
 				
 	lineSvg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(" + scaleOffset + ",0)")
+				.attr("transform", "translate(" + axisOffset + ",0)")
 				.call(lineYAxis)
 				.append("text")
 					.attr("transform","rotate(-90)")
@@ -811,7 +816,7 @@ function generateLineGraph(){
 				.attr("id", function(d) { return d.year.toString() + " " + genreName + " Point"; })
 		      	.attr("class", "point")
 		      	.attr("cx", function(d) { return lineXScale(d.year); })
-				.attr("cy", function(d) { return lineYScale(d[genreName]); })
+				.attr("cy", function(d) { return lineYValueScale(d[genreName]); })
 				.attr("r", 5)
 				.on("mouseover", function(d) {
 					removeDetails("g.legend");
