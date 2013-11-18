@@ -67,8 +67,8 @@ var dateFormat = d3.time.format("%Y-%m-%d").parse;
 var indexCurrYValue = 0;
 var yValues = ["inflation_domestic_income", "domestic_income"];
 
-var scaleOffset = 50;
-var axisLabelMargin = 40;
+var scaleOffset = 65;
+var axisLabelMargin = 55;
 var axisLabelWidth = 50;
 
 // Radius of a bubble
@@ -459,7 +459,8 @@ function generateBubbleGraph(){
 	var bubbleYAxis = d3.svg.axis()
 						.scale(bubbleYScale)
 						.orient("left")
-						.ticks(6);
+						.ticks(6)
+						.tickFormat(function(d) { return incomeFormat(d); });
 					
 	bubbleSvg.append("g")
 		.attr("class", "axis")
@@ -467,7 +468,7 @@ function generateBubbleGraph(){
 		.call(bubbleXAxis)
 		.append("text")
 		.attr("text-anchor","middle")
-		.attr("x", (chartWidth - scaleOffset) / 2)
+		.attr("x", chartWidth / 2)
 		.attr("y", axisLabelMargin - 12)
 		.text("Movie Release Date");
 	
@@ -681,7 +682,7 @@ function generateLineGraph(){
 						.scale(lineYScale)
 						.orient("left")
 						.ticks(8)
-						.tickFormat(d3.format(",.2s"));
+						.tickFormat(function(d) { return incomeFormat(d / factor); });
 				
 	lineSvg.append("g")
 				.attr("class", "axis")
@@ -689,8 +690,8 @@ function generateLineGraph(){
 				.call(lineXAxis)
 				.append("text")
 					.attr("text-anchor","middle")
-					.attr("x", (chartWidth - scaleOffset) / 2)
-					.attr("y", axisLabelMargin)
+					.attr("x", chartWidth / 2)
+					.attr("y", axisLabelMargin - 12)
 					.text("Year");
 				
 	lineSvg.append("g")
