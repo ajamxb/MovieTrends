@@ -658,20 +658,21 @@ function generateLineGraph(){
 	var maxIncome = 6500000000;
 	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
 	
+	// set up axis scales
 	var lineXScale = d3.scale.linear()
         					.domain([years[0] - 0.5, years[years.length-1] + 1])
         					.range([scaleOffset, chartWidth - scaleOffset]);
 
     var lineYScale = d3.scale.linear()
     						.domain([maxIncome,0])
-    						.range([scaleOffset, chartHeight - scaleOffset]);
+    						.range([scaleOffset, chartHeight - scaleOffset - 3]);
     						
 	var line = d3.svg.line()
 				    .x(function(d) { return lineXScale(d.year); })
 				    .y(function(d) { return lineYScale(d.income); });
     
     
-	// draw axes
+	// set up axes
 	var lineXAxis = d3.svg.axis()
 						.scale(lineXScale)
 						.orient("bottom")
@@ -683,27 +684,6 @@ function generateLineGraph(){
 						.orient("left")
 						.ticks(8)
 						.tickFormat(function(d) { return incomeFormat(d / factor); });
-				
-	lineSvg.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(0," + (chartHeight-scaleOffset) + ")")
-				.call(lineXAxis)
-				.append("text")
-					.attr("text-anchor","middle")
-					.attr("x", chartWidth / 2)
-					.attr("y", axisLabelMargin - 12)
-					.text("Year");
-				
-	lineSvg.append("g")
-				.attr("class", "axis")
-				.attr("transform", "translate(" + scaleOffset + ",0)")
-				.call(lineYAxis)
-				.append("text")
-					.attr("transform","rotate(-90)")
-					.attr("text-anchor","middle")
-					.attr("x", -(chartHeight) / 2)
-			        .attr("y", -axisLabelMargin)
-			        .text(determineCurrentLabel());
 			        
 	// draw bars representing total income for top 25 movies each year
 	var barColor = "#d3d3d3";
@@ -757,6 +737,28 @@ function generateLineGraph(){
 									.attr("fill", barColor);
 							}
 						});
+	
+	// draw axes
+	lineSvg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (chartHeight-scaleOffset) + ")")
+				.call(lineXAxis)
+				.append("text")
+					.attr("text-anchor","middle")
+					.attr("x", chartWidth / 2)
+					.attr("y", axisLabelMargin - 12)
+					.text("Year");
+				
+	lineSvg.append("g")
+				.attr("class", "axis")
+				.attr("transform", "translate(" + scaleOffset + ",0)")
+				.call(lineYAxis)
+				.append("text")
+					.attr("transform","rotate(-90)")
+					.attr("text-anchor","middle")
+					.attr("x", -(chartHeight) / 2)
+			        .attr("y", -axisLabelMargin)
+			        .text(determineCurrentLabel());
 						
 	// draw lines representing total incomes for each genre group
 	var genreLines = lineSvg.selectAll(".genreLine")
@@ -841,7 +843,6 @@ function generateLineGraph(){
 		}
 	);
 	
-
 	d3.selectAll(".point").moveToFront();
 
 	// draw graph title
