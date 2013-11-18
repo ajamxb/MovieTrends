@@ -4,16 +4,15 @@ var moviesDataset;
 // Contains genre data for the top 25 movies from 1983-2012
 var genreGroupsIncomeDataset, genreGroupsIncomeInflationDataset;
 
-// Contains total incomes from 1983-2012
+// Contains total incomes for the top 25 movies from 1983-2012
 var totalIncomeDataset;
 
 // CSV filenames 
 var files = new Array("1983-2012_movies.csv", "1983-2012_movies_totalincomes.csv", "1983-2012_genre_groups_income.csv", "1983-2012_genre_groups_income_inflation.csv");
 
 // Dimensions for all the components in our vis
-var svg;
 var svgWidth = 1000;
-var svgHeight = 800; //Changed for the bar graph. 
+var svgHeight = 800;
 var totalChartHeight = 300;
 var chartWidth = 1000;
 var chartHeight = 300;
@@ -30,11 +29,8 @@ var svg, bubbleSvg, detailsSvg, lineSvg, barSvg;
 // Details on demand space
 var detailsRect;
 
-// array of 20 colors - will be indexed/accessed by genre name (e.g. color[Comedy])
-var color = d3.scale.category20();
-
 // Linechart Variables
-// once data is imported, will map genre name to values (.year and .count)
+// once data is imported, will map genre group name to values (.year and .count)
 var genreGroupsIncome, genreGroupsIncomeInflation;
 
 // Bubblechart variables /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +179,7 @@ function loadData(filename){
             	genreGroupsIncomeDataset = data;
             	
             	// adapted example from http://bl.ocks.org/mbostock/3884955
-	            color.domain(d3.keys(data[0]).filter(function(key) { return key !== "year"; }));
+	            // d3.keys(data[0]).filter(function(key) { return key !== "year"; })
 	            
 	            genreGroupsIncome = d3.keys(data[0]).filter(function(key) { return key !== "year"; })
 	            			.map(function(name) {
@@ -643,7 +639,6 @@ d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
 /*
  * generates the line graph to display genre data
  * @author Allison Chislett
- * @version Oct30_2013
  */
 function generateLineGraph(){
 	
@@ -698,11 +693,16 @@ function generateLineGraph(){
 			        .attr("y", -axisLabelMargin)
 			        .text(determineCurrentLabel());
 			        
-			        
-	var bars = lineSvg.selectAll("rect")
+	// draw bars representing total income for top 25 movies each year
+	var barColor = "#d3d3d3";
+	var barHighlightColor = "#b0b0b0";	        
+	var bars = lineSvg.append("g")
+						.attr("class", "bars")
+						.selectAll("rect")
 						.data(totalIncomeDataset)
 						.enter()
 						.append("rect")
+						.attr("id", function(d) { return d.year.toString() + "bar"; })
 						.attr("class", "bar")
 						.attr("x", function(d) {
 							return lineXScale(d.year) - barWidth / 2;
@@ -714,14 +714,31 @@ function generateLineGraph(){
 						.attr("height", function(d) {
 							return chartHeight - scaleOffset - lineYScale(d.inflation_domestic_income);
 						})
-						.attr("fill", "#d3d3d3")
+						.attr("fill", function(d) {
+							if(d.year == currYear) return barHighlightColor;
+							else return barColor;
+						})
 						.on("click", function(d) {
+							d3.selectAll(".bar")
+								.attr("fill", barColor);
+							d3.select(this)
+								.attr("fill", barHighlightColor);
 							currYear = d.year;
 							updateBubbleGraph();
+						})
+						.on("mouseover", function(d) {
+							d3.select(this)
+								.attr("fill", barHighlightColor);
+						})
+						.on("mouseout", function(d) {
+							if(d.year != currYear) {
+								d3.select(this)
+									.attr("fill", barColor);
+							}
 						});
 								        
-			        
-	// draw lines
+								        
+	// draw lines representing total incomes for each genre group
 	var genreLines = lineSvg.selectAll(".genreLine")
 						      	.data(function() { 
 						      			if(indexCurrYValue == 0) 
@@ -734,7 +751,7 @@ function generateLineGraph(){
 	
 						      	
 	genreLines.append("path")
-		  .attr("id", function(d) { return d.name.concat("Line"); })
+		  .attr("id", function(d) { return d.name + " Line"; })
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
 	      .on("mouseover", function(d) { 
@@ -769,7 +786,7 @@ function generateLineGraph(){
 				})
 				.enter()
 				.append("circle")
-				.attr("id", function(d) { return d.year.toString().concat(genreName,"Point"); })
+				.attr("id", function(d) { return d.year.toString() + " " + genreName + " Point"; })
 		      	.attr("class", "point")
 		      	.attr("cx", function(d) { return lineXScale(d.year); })
 				.attr("cy", function(d) { return lineYScale(d[genreName]); })
@@ -782,6 +799,7 @@ function generateLineGraph(){
 					currIncome = "Income: $" + d[genreName];
 					highlightPoint(this);
 					highlightLine(thisLine);
+					displayPointDetails();
 				})
 				.on("mouseout", function(d) {
 					displayLegend(); 
@@ -789,8 +807,9 @@ function generateLineGraph(){
 					unhighlightLine(thisLine);
 					removeDetails("text.details");
 				})
-				.on("click", function(d) { currYear = d.year; 
-											updateBubbleGraph(); 
+				.on("click", function(d) { 
+					currYear = d.year; 
+					updateBubbleGraph(); 
 				})
  				.attr("opacity", 0.0)
  				.style("stroke", function(d, i) { 
@@ -801,7 +820,8 @@ function generateLineGraph(){
 				.style("fill", "white");
 		}
 	);
-					
+	
+
 	d3.selectAll(".point").moveToFront();
 
 }
@@ -842,8 +862,6 @@ function highlightPoint(o) {
 	d3.select(o)
 		.attr("opacity", 1.0);
 
-	displayPointDetails();
-	      		
 	d3.selectAll(".point").moveToFront();
 }
 
@@ -854,9 +872,7 @@ function highlightPoint(o) {
 function unhighlightPoint(o) {
 	d3.select(o)
 		.attr("opacity", 0.0);
-		
-	removeDetails();
-	        
+
 	d3.selectAll(".point").moveToFront();
 }
 
