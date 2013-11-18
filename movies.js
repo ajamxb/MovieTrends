@@ -665,7 +665,7 @@ function generateLineGraph(){
 
     var lineYScale = d3.scale.linear()
     						.domain([maxIncome,0])
-    						.range([scaleOffset, chartHeight - scaleOffset - 3]);
+    						.range([scaleOffset, chartHeight - scaleOffset]);
     						
 	var line = d3.svg.line()
 				    .x(function(d) { return lineXScale(d.year); })
