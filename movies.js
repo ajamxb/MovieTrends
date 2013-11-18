@@ -99,7 +99,9 @@ var factor = 1000000.0;
 // These are set when hovering over a point on the line graph or a movie in the bubble graph
 var year, currDistributor, currRating, currGenre, currTitle, currBudget, currIncome, currAdjustedIncome;
 
-
+// formats dollar amount with dollar sign and commas							        
+var incomeFormat = d3.format("$,f");
+	
 /*
  * We have referenced this code from https://gist.github.com/trtg/3922684
  * We use this to move an element to the front.
@@ -523,8 +525,8 @@ function generateBubbleGraph(){
                	currGenre = "Genre: " + d.genre;
                	currTitle = d.title;
                	currBudget = "Production Budget: " + d.formatted_production_budget;
-               	currIncome = "Domestic Income: " + d.formatted_domestic_income;
-               	currAdjustedIncome = "Adjusted Income: " + d.formatted_inflation_domestic_income;
+               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
+               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
                	displayDetails();
             })
             .on("mouseout", function(d) { 
@@ -738,15 +740,23 @@ function generateLineGraph(){
 						.on("mouseover", function(d) {
 							d3.select(this)
 								.attr("fill", barHighlightColor);
+							lineSvg.append("text")
+									.attr("class", "barDetails")
+									.attr("x", chartWidth / 2)
+									.attr("y", 45)
+									.attr("text-anchor", "middle")
+									.text(function() { 
+										return d.year + " | " + incomeFormat(d.inflation_domestic_income); })
+									.style("font-size", "12px");
 						})
 						.on("mouseout", function(d) {
+							lineSvg.selectAll(".barDetails").remove();
 							if(d.year != currYear) {
 								d3.select(this)
 									.attr("fill", barColor);
 							}
 						});
-								        
-								        
+						
 	// draw lines representing total incomes for each genre group
 	var genreLines = lineSvg.selectAll(".genreLine")
 						      	.data(function() { 
@@ -805,7 +815,7 @@ function generateLineGraph(){
 					removeDetails("text.legend");
 					year = d.year;
 					currGenre = "Genres: " + genreName;
-					currIncome = "Income: $" + d[genreName];
+					currIncome = "Income: " + incomeFormat(d[genreName]);
 					highlightPoint(this);
 					highlightLine(thisLine);
 					displayPointDetails();
