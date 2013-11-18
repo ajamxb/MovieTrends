@@ -548,6 +548,15 @@ function generateBubbleGraph(){
 				}
 				return 1.0;
 			});
+			
+	// draw graph title
+	bubbleSvg.selectAll(".graphTitle").remove();
+	bubbleSvg.append("text")
+			.attr("class", "graphTitle")
+			.attr("x", chartWidth / 2)
+			.attr("y", 25)
+			.attr("text-anchor", "middle")
+			.text("Top 25 Movies | " + currYear.toString());
 }
 
 /*
@@ -824,6 +833,13 @@ function generateLineGraph(){
 
 	d3.selectAll(".point").moveToFront();
 
+	// draw graph title
+	lineSvg.append("text")
+			.attr("class", "graphTitle")
+			.attr("x", chartWidth / 2)
+			.attr("y", 25)
+			.attr("text-anchor", "middle")
+			.text("Total Income for Top 25 Movies per Year");
 }
 
 
