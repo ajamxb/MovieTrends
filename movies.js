@@ -242,7 +242,7 @@ function generateDetails() {
 					.attr("y", "0")
 					.attr("width", detailsWidth)
 					.attr("height", detailsHeight)
-					.attr("fill", "rgb(240,240,240)");
+					.attr("fill", "rgb(248,248,248)");
 	
 	displayLegend();
 }
@@ -624,7 +624,7 @@ function generateLineGraph(){
     
     
 	// draw bars representing total income for top 25 movies each year
-	var barColor = "#d3d3d3";
+	var barColor = "rgb(230,230,230)";
 	var barHighlightColor = "#b0b0b0";	        
 	var bars = lineSvg.append("g")
 						.attr("class", "bars")
