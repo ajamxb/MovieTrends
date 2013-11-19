@@ -78,6 +78,13 @@ var stroke = 4;
 // Width of a bar 
 var barWidth = 25;
 
+// Sizes of the text
+var regTextSize = 11;
+var smallText = 5;
+
+var regTitleSize = 24;
+var smallTitleSize = 18;
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Horror, Fantasy, Sci-Fi", 
@@ -113,7 +120,7 @@ d3.selection.prototype.moveToFront = function() {
 };
 
 // set up the svg layout 
-function setupLayout(){
+function setupLayout() {
 	
 	var data = d3.select("#data");
 	
@@ -255,7 +262,7 @@ function displayLegend() {
  * the bubble chart key.
  * @author ajam
  */
-function displayBubbleChartKey(){
+function displayBubbleChartKey() {
 	
 	var xOffset = 20;
 	var yOffset = 20;
@@ -481,7 +488,10 @@ function generateBubbleGraph(){
 		.attr("transform","rotate(-90)")
 		.attr("x", -(chartHeight) / 2)
         .attr("y", -axisLabelMargin)
-        .text(determineCurrentLabel());	     					 
+        .text(determineCurrentLabel());	 
+    
+    bubbleSvg.selectAll("text")
+    			.attr("font-size", regTextSize);    					 
 			
 	var bubbles = bubbleSvg.append("g")
 						.attr("class", "bubbles")
@@ -582,71 +592,7 @@ function updateBubbleGraph() {
 	bubbleSvg.selectAll("g").remove();
 	generateBubbleGraph();
 }
-
-
-  
-  /*
-* generates the bar graph to display the total income of the particular year.
-*@author Bharadwaj Tanikella
-*/
-function barGraph(){
-	var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-
-var x = d3.scale.ordinal()
-    .rangeRoundBands([0, chartWidth-margin.left-margin.right], .1);
-
-var y = d3.scale.linear()
-    .range([height, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(8);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", chartWidth)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-d3.csv("1983-2012_movies_totalincomes.csv", function(error, data) {
-  x.domain(data.map(function(d) { return d.year; }));
-  y.domain([0, d3.max(data, function(d) { return d.inflation_domestic_income/factor;  })]);
-
-  svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Income per year(in Millions USD)");
-
-  svg.selectAll(".bar")
-      .data(data)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.year); })
-      .attr("width", x.rangeBand())
-      .attr("y", function(d) { return y(d.inflation_domestic_income/factor); })
-      .attr("height", function(d) { return height - y(d.inflation_domestic_income/factor); })
-	  .attr('fill', 'lightgrey');
-
-});
-}
-  
+ 
 
 /*
  * generates the line graph to display genre data
@@ -770,6 +716,10 @@ function generateLineGraph(){
 					.attr("x", -(chartHeight) / 2)
 			        .attr("y", -axisLabelMargin)
 			        .text(determineCurrentLabel());
+			        
+			        
+	lineSvg.selectAll("text")
+			.attr("font-size", regTextSize);
 						
 	// draw lines representing total incomes for each genre group
 	var genreLines = lineSvg.selectAll(".genreLine")
@@ -914,6 +864,3 @@ function unhighlightPoint(o) {
 
 	d3.selectAll(".point").moveToFront();
 }
-
-
-
