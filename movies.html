@@ -15,11 +15,9 @@
 
     </div>
     <div id="filter" style="float: left">
-        <select>
-            <option>Genre</option>
-            <option>Rating</option>
-        </select>
+		
 		<ul>
+		<li style="font-weight: bold">Genre</li>
 		<li><label class="checkbox">
              <input class="selectGenre" type="checkbox" id="action"  name="Action"
              onclick="selectGenre('Action');">
@@ -87,6 +85,7 @@
 			 
 		</ul>
 		<ul>
+		<li style="font-weight: bold">Rating</li>
 		<li><label class="checkbox">
              <input class="selectRating" type="checkbox" id="g"  name="G"
              onclick="selectRating('G');">
@@ -104,6 +103,42 @@
              onclick="selectRating('R');">
              R</label></li>
 		</ul>
+		<ul>
+			 <li style="font-weight: bold">Distributor</li>
+			 <li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="buenaVista" value="Buena Vista"
+             onclick="selectDistributor(this.value);">
+             Buena Vista</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="dreamWorks" value="Dream Works"
+             onclick="selectDistributor(this.value);">
+             Dream Works</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="fox" value="Fox"
+             onclick="selectDistributor(this.value);">
+             Fox</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="paramountPictures" value="Paramount Pictures"
+             onclick="selectDistributor(this.value);">
+             Paramount Pictures</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="sonyPictures" value="Sony Pictures"
+             onclick="selectDistributor(this.value);">
+             Sony Pictures</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="universal"  name="Universal"
+             onclick="selectDistributor(this.value);">
+             Universal</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="warnerBros"  name="Warner Bros."
+             onclick="selectDistributor(this.value);">
+             Warner Bros.</label></li>
+		<li><label class="checkbox">
+             <input class="selectDistributor" type="checkbox" id="other" value="Other"
+             onclick="selectDistributor(this.value);">
+             Other</label></li>
+		</ul>
+
     </div>
 </body>
 </html>
