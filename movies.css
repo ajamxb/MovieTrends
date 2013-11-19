@@ -17,20 +17,14 @@ svg{
 
 .axis text {
     font-family: sans-serif;
-    font-size: 11px;
 }
 
 .bar: hover{
 	fill:grey;
 }
-.title {
-	font-size: 24px;
-}
-
 
 text {
 	font-family: sans-serif;
-    font-size: 18px;
 }
 
 text.legend {
