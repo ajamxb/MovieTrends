@@ -112,6 +112,9 @@ var factor = 1000000.0;
 // These are set when hovering over a point on the line graph or a movie in the bubble graph
 var year, currDistributor, currRating, currGenre, currTitle, currBudget, currIncome, currAdjustedIncome;
 
+// boolean to let us know if movie details are currently being displayed
+var movieDetailsOn = false;
+
 // formats dollar amount with dollar sign and commas							        
 var incomeFormat = d3.format("$,f");
 	
@@ -501,10 +504,32 @@ function generateBubbleGraph(){
 			
 	var bubbles = bubbleSvg.append("g")
 						.attr("class", "bubbles")
+						/*
+						.on("click", function(d) {
+							if(movieDetailsOn) {
+								movieDetailsOn = false;
+								console.log("g " + movieDetailsOn);
+			            		// hide move details
+			            		displayLegend();
+				                d3.select(this.parentNode)
+				                	.selectAll("circle")
+				                    .attr("opacity", 1.0);
+				               	currDistributor = "";
+				               	currRating = "";
+				               	currGenre = "";
+				               	currTitle = "";
+				               	currBudget = "";
+				               	currIncome = "";
+				               	currAdjustedIncome = "";
+				               	removeDetails("text.details");
+				            }
+						})
+						*/
 						.selectAll("circle")
 						.data(moviesDataset)
 						.enter()
 						.append("circle");
+						
 
 			
 	bubbles.attr("class", "visible")
@@ -531,35 +556,49 @@ function generateBubbleGraph(){
 				return genreColors[parseInt(d.genre1_index)];
 			})
 			.on("mouseover", function(d) { 
-				removeDetails("g.legend");
-				removeDetails("text.legend");
-            	d3.select(this.parentNode)
-                	.selectAll("circle")
-                    .attr("opacity", 0.5);
-                d3.select(this).moveToFront()
-                	.attr("opacity", 1.0);
-               	currDistributor = "Distributor: " + d.distributor;
-               	currRating = "Rating: " + d.rating;
-               	currGenre = "Genre: " + d.genre;
-               	currTitle = d.title;
-               	currBudget = "Production Budget: " + d.formatted_production_budget;
-               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
-               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
-               	displayDetails();
+				
             })
             .on("mouseout", function(d) { 
-            	displayLegend();
-                d3.select(this.parentNode)
-                	.selectAll("circle")
-                    .attr("opacity", 1.0);
-               	currDistributor = "";
-               	currRating = "";
-               	currGenre = "";
-               	currTitle = "";
-               	currBudget = "";
-               	currIncome = "";
-               	currAdjustedIncome = "";
-               	removeDetails("text.details");
+            	
+            })
+            .on("click", function(d) {
+            	if(movieDetailsOn){
+            		movieDetailsOn = false;
+            		//console.log("c " + movieDetailsOn);
+            		// hide move details
+            		displayLegend();
+	                d3.select(this.parentNode)
+	                	.selectAll("circle")
+	                    .attr("opacity", 1.0);
+	               	currDistributor = "";
+	               	currRating = "";
+	               	currGenre = "";
+	               	currTitle = "";
+	               	currBudget = "";
+	               	currIncome = "";
+	               	currAdjustedIncome = "";
+	               	removeDetails("text.details");
+            	}
+            	else {
+            		movieDetailsOn = true;
+            		//console.log("c " + movieDetailsOn);
+            		// show movie details
+            		removeDetails("g.legend");
+					removeDetails("text.legend");
+	            	d3.select(this.parentNode)
+	                	.selectAll("circle")
+	                    .attr("opacity", 0.5);
+	                d3.select(this).moveToFront()
+	                	.attr("opacity", 1.0);
+	               	currDistributor = "Distributor: " + d.distributor;
+	               	currRating = "Rating: " + d.rating;
+	               	currGenre = "Genre: " + d.genre;
+	               	currTitle = d.title;
+	               	currBudget = "Production Budget: " + d.formatted_production_budget;
+	               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
+	               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
+	               	displayDetails();
+            	}
             })
 			.attr("stroke-width", stroke)
 			.attr("opacity", function (d) {
@@ -576,7 +615,7 @@ function generateBubbleGraph(){
 			.attr("x", chartWidth / 2)
 			.attr("y", 25)
 			.attr("text-anchor", "middle")
-			.text("Top 25 Movies | " + currYear.toString());
+			.text("Domestic Income for Top 25 Movies in the U.S. | " + currYear.toString());
 }
 
 /*
@@ -587,9 +626,20 @@ function generateBubbleGraph(){
  */      
 function determineCurrentLabel() {
 	if (indexCurrYValue == 0) {
-		return " Adjusted Domestic Income (in millions USD)";
+		return " Adjusted Income (millions USD)";
 	}
-	return "Domestic Income (in USD millions)";
+	return "Income (millions USD)";
+}
+
+/*
+ * Determines the label for the y-axes based on what mode (adjusted income or
+ * actual domestic income) the user is in.
+ */
+function determineCurrentBarYLabel() {
+	if (indexCurrYValue == 0) {
+		return " Adjusted Income (billions USD)";
+	}
+	return "Income (billions USD)";
 }
 
 /*
@@ -700,7 +750,7 @@ function generateLineGraph(){
 						.scale(lineYScale)
 						.orient("left")
 						.ticks(8)
-						.tickFormat(function(d) { return incomeFormat(d / factor); });
+						.tickFormat(function(d) { return incomeFormat(d / (factor*1000)); });
 			        
 	// draw axes
 	lineSvg.append("g")
@@ -727,7 +777,7 @@ function generateLineGraph(){
 					.attr("text-anchor","middle")
 					.attr("x", -(chartHeight) / 2)
 			        .attr("y", -axisLabelMargin)
-			        .text(determineCurrentLabel());
+			        .text(determineCurrentBarYLabel());
 			        
 			        
 	lineSvg.selectAll("text")
@@ -824,7 +874,7 @@ function generateLineGraph(){
 			.attr("x", chartWidth / 2)
 			.attr("y", 25)
 			.attr("text-anchor", "middle")
-			.text("Total Income for Top 25 Movies per Year");
+			.text("Total Domestic Income for Top 25 Movies per Year in the U.S.");
 }
 
 
