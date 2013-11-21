@@ -682,6 +682,10 @@ function generateLineGraph(){
 								d3.select(this)
 									.attr("fill", barColor);
 							}
+							else {
+								d3.select(this)
+									.attr("fill", barSelectedColor);
+							}
 						});
 	
 	// set up axes
