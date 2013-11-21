@@ -75,6 +75,9 @@ var axisLabelWidth = 50;
 var radius = 7;
 var stroke = 4;
 
+var bubbleXScale;
+var bubbleYScale;
+
 // Width of a bar 
 var barWidth = 25;
 
@@ -98,6 +101,9 @@ var genreColorKeyValue = {"Action, Adventure, Thriller, Crime, Western": "#D63E3
 					  "Comedy, Musical": "#F5EA58",
 					  "Drama, Romance, War": "#89739E",
 					  "Documentary": "#BFE3E1"};
+					  
+var distributor = ["Buena Vista", "DreamWorks", "Fox", "Paramount Pictures", "Sony Pictures",
+					"Universal", "Warner Bros.", "Other"];					 
 
 // Instead of having incomes display as millions (1,000,000), have them display as 100
 var factor = 1000000.0;
@@ -448,11 +454,11 @@ function removeDetails(className) {
 function generateBubbleGraph(){
 
 	// Setup the scales
-	var bubbleXScale = d3.time.scale()
+	bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
         					.range([axisOffset, chartWidth - axisOffset]);
         			
-    var bubbleYScale = d3.scale.linear()
+    bubbleYScale = d3.scale.linear()
     						.domain([d3.min(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;}),
     								d3.max(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
     						.range([chartHeight - axisOffset, axisOffset]);
@@ -501,7 +507,8 @@ function generateBubbleGraph(){
 						.append("circle");
 
 			
-	bubbles.attr("cx", function(d) {
+	bubbles.attr("class", "visible")
+			.attr("cx", function(d) {
 				if (d.production_year == currYear) {
 					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
 				}
@@ -864,3 +871,45 @@ function unhighlightPoint(o) {
 
 	d3.selectAll(".point").moveToFront();
 }
+
+/*
+ * Filter for distributors.
+ */
+function selectDistributor(value){
+	filterByDistributor(value, false);
+}
+
+function filterByDistributor(value, bool) {
+	
+	var isChecked = document.getElementById(value).checked;
+	
+    d3.selectAll(".visible")
+    	.attr("cx", function(d) {
+	    	if (isChecked == bool && d.distributor_filter == value) {
+	    			return hiddenCoordinate;
+	    	}
+	    	if (d.production_year == currYear) {
+				return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
+			}
+			return hiddenCoordinate; 		
+    		
+    	})
+    	.attr("cy", function(d) {
+    		
+	    	if (isChecked == bool && d.distributor_filter == value) {
+	    		return hiddenCoordinate;
+	    	}
+	    	if (d.production_year == currYear) {
+				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
+			}
+			return hiddenCoordinate; 
+    	})
+    	.attr("class", function(d) {
+	    	if (isChecked == bool && d.distributor_filter == value) {
+	    		return "hidden";
+	   		}
+	   		return "visible";	
+    	});
+}
+
+
