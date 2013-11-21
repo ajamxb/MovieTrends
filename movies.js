@@ -632,7 +632,8 @@ function generateLineGraph(){
     
 	// draw bars representing total income for top 25 movies each year
 	var barColor = "rgb(230,230,230)";
-	var barHighlightColor = "#b0b0b0";	        
+	var barHighlightColor = "#f0f0f0";	
+	var barSelectedColor = "#b0b0b0"        
 	var bars = lineSvg.append("g")
 						.attr("class", "bars")
 						.selectAll("rect")
@@ -652,14 +653,14 @@ function generateLineGraph(){
 							return chartHeight - axisOffset - lineYValueScale(d.inflation_domestic_income);
 						})
 						.attr("fill", function(d) {
-							if(d.year == currYear) return barHighlightColor;
+							if(d.year == currYear) return barSelectedColor;
 							else return barColor;
 						})
 						.on("click", function(d) {
 							d3.selectAll(".bar")
 								.attr("fill", barColor);
 							d3.select(this)
-								.attr("fill", barHighlightColor);
+								.attr("fill", barSelectedColor);
 							currYear = d.year;
 							updateBubbleGraph();
 						})
