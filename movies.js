@@ -615,7 +615,7 @@ function generateBubbleGraph(){
 			.attr("x", chartWidth / 2)
 			.attr("y", 25)
 			.attr("text-anchor", "middle")
-			.text("Domestic Income for Top 25 Movies in the U.S. | " + currYear.toString());
+			.text("U.S. Domestic Income for Top 25 Movies | " + currYear.toString());
 }
 
 /*
@@ -874,7 +874,7 @@ function generateLineGraph(){
 			.attr("x", chartWidth / 2)
 			.attr("y", 25)
 			.attr("text-anchor", "middle")
-			.text("Total Domestic Income for Top 25 Movies per Year in the U.S.");
+			.text("U.S. Total Domestic Income for Top 25 Movies per Year");
 }
 
 
