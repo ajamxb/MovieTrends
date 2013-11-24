@@ -503,7 +503,7 @@ function generateBubbleGraph(){
     			.attr("font-size", regTextSize);    					 
 			
 	var bubbles = bubbleSvg.append("g")
-						.attr("class", "bubbles")
+						.attr("class", "bubbleChartSvg")
 						/*
 						.on("click", function(d) {
 							if(movieDetailsOn) {
@@ -532,28 +532,28 @@ function generateBubbleGraph(){
 						
 
 			
-	bubbles.attr("class", "visible")
+	bubbles.attr("class", "bubble")
 			.attr("cx", function(d) {
-				if (d.production_year == currYear) {
-					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
-				}
-				return hiddenCoordinate; 
+				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
-			.attr("cy", function (d) {
-				if (d.production_year == currYear) {
-					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
-				}
-				return hiddenCoordinate;
+			.attr("cy", function(d) {
+				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
 			})
 			.attr("r", radius)
-			.attr("fill", function (d) {
+			.attr("fill", function(d) {
 				return genreColors[parseInt(d.genre1_index)];
 			})
-			.attr("stroke", function (d) {
+			.attr("stroke", function(d) {
 				if (d.genre2_index != "") {
 					return genreColors[parseInt(d.genre2_index)];
 				}
 				return genreColors[parseInt(d.genre1_index)];
+			})
+			.attr("visibility", function(d) {
+				if (d.production_year == currYear) {
+					return "visible"
+				}
+				return "hidden";				
 			})
 			.on("mouseover", function(d) { 
 				
@@ -858,7 +858,6 @@ function generateLineGraph(){
 				})
  				.attr("opacity", 0.0)
  				.style("stroke", function(d, i) { 
- 					console.log(genreName);
  					return genreColorKeyValue[genreName];
  				})
  				.style("stroke-width", 2)
@@ -931,15 +930,18 @@ function unhighlightPoint(o) {
  * Filter for distributors.
  */
 function selectDistributor(value) {
-
+	
+    /*d3.selectAll(".bubble").each(function (d) {
+    	console.log(d3.select(this).attr("visibility"));
+    });*/
 
 	var isChecked = document.getElementById(value).checked;
 	
 	if (isChecked == false) {
-		filter(".visible", isChecked, "distributor_filter", value, "hidden", "visible");
+		filter("visible", isChecked, "distributor_filter", value, "hidden", "visible");
 	}
 	else {
-		filter(".hidden", isChecked, "distributor_filter", value, "visible", "hidden");
+		filter("hidden", isChecked, "distributor_filter", value, "visible", "hidden");
 	}
 }
 
@@ -957,56 +959,30 @@ function selectDistributor(value) {
  * @param {Object} status1 update the class of the bubble to this value if conditions are met
  * @param {Object} status2 update the class of the bubble to this value if conditions aren't met
  */
-function filter(classAttr, checkboxInput, filterType, category, status1, status2) {
+function filter(visibilityAttribute, checkboxInput, filterType, category, status1, status2) {
 	
-    d3.selectAll(classAttr)
-    	.attr("cx", function(d, i) {
-    		return determinePosition(checkboxInput, d[filterType], category, d.production_year, 
-    								 bubbleXScale(new Date(currYear, d.month - 1, d.day))); 
-				    		
-    	})
-    	.attr("cy", function(d) {
-			return determinePosition(checkboxInput, d[filterType], category, d.production_year, 
-				                     bubbleYScale(d[yValues[indexCurrYValue]] / factor)); 
-    	})
-    	.attr("class", function(d) {
-    		if (checkboxInput == false) {
-    			if (d[filterType] == category) {
-		    		return status1;
-		   		}
-		   		return status2;	
-    		}
-    		 
-    		else if (checkboxInput == true && d[filterType] == category && d.production_year == currYear) {
-		   		return status1;
-			}
-		   	return status2;	    			 		    	
-    	});
-}
-
-/**
- * Determine the new x or y-coordinate for points that are hidden/visible.
- * Points that are hidden, get moved to (-100, -100).
- * 
- * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
- * @param {Object} filterType actual value of the filter 
- * @param {Object} category the actual category for which the checkbox corresponds
- * @param {Object} year the year d3 is iterating through the data
- * @param {Object} scaleValueType type of scale used (can be for the x or y axis)
- */
-function determinePosition(checkboxInput, filterType, category, year, scaleValueType) {
-    if (checkboxInput == false) {
-    	if (filterType == category) {
-		    return hiddenCoordinate;
+	var visibilityStatus;
+	
+	d3.selectAll(".bubble").each(function(d) {
+		visibilityStatus = d3.select(this).attr("visibility");
+		
+		if (visibilityStatus == visibilityAttribute) {
+			d3.select(this)
+		    	.attr("visibility", function(d) {
+						if (checkboxInput == false) {
+					    	if (d[filterType] == category || d.production_year != currYear) {
+							    return "hidden";
+							}
+							else {
+								return "visible";
+							}
+						}
+						else if (checkboxInput == true && d[filterType] == category && d.production_year == currYear) {
+							return "visible";
+						}
+						return "hidden";
+							    		
+		    	});
 		}
-		else if (year == currYear) {
-			return scaleValueType; 
-		}
-		return hiddenCoordinate; 
-    }
-    		
-    else if (checkboxInput == true && filterType == category && year == currYear) {
-		return scaleValueType;
-	}
-	return hiddenCoordinate;	
+	});
 }
