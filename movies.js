@@ -918,6 +918,7 @@ function highlightPoint(o) {
 /*
  * Returns the point to its normal state when
  * the user is not hovering over it.
+ * 
  */
 function unhighlightPoint(o) {
 	d3.select(o)
@@ -926,40 +927,72 @@ function unhighlightPoint(o) {
 	d3.selectAll(".point").moveToFront();
 }
 
-/*
- * Filter for distributors.
- */
-function selectDistributor(value) {
-	
-    /*d3.selectAll(".bubble").each(function (d) {
-    	console.log(d3.select(this).attr("visibility"));
-    });*/
 
-	var isChecked = document.getElementById(value).checked;
-	
-	if (isChecked == false) {
-		filter("visible", isChecked, "distributor_filter", value, "hidden", "visible");
-	}
-	else {
-		filter("hidden", isChecked, "distributor_filter", value, "visible", "hidden");
-	}
+/**
+ * Filter for genres. This is the function that gets called when a 
+ * checkbox under the Genre category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ */
+function selectGenre(value) {
+	filter(value, "genre1");
+	filter(value, "genre2");
 }
 
 /**
- * Updates the visualization depending on the input for the checkboxes (filter).
- * If the checkbox has been unchecked (i.e., it's false) look at "visible" bubbles 
- * and see which ones match with the checkbox's category; make these elements 
- * "hidden." Otherwise, only look at the "hidden" bubbles and see which ones match
- * with the checkbox's category; make these elements "visible."
+ * Filter for ratings. This is the function that gets called when a 
+ * checkbox under the Rating category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ */
+function selectRating(value) {
+	filter(value, "rating");
+}
+
+/**
+ * Filter for distributors. This is the function that gets called when a 
+ * checkbox under the Distributor category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ */
+function selectDistributor(value) {
+	filter(value, "distributor_filter");
+}
+
+
+/**
+ * Filter for the elements that get checked/uncked in the checkboxes.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @param {Object} filterName the name of the column in the dataset D3 will 
+ *                 use to see whether a bubble has the same category that is
+ *                 being filtered 
+ */
+function filter(value, filterName) {
+	
+	var isChecked = document.getElementById(value).checked;
+	
+	if (isChecked == false) {
+		updateBubbleVisibility("visible", isChecked, filterName, value);
+	}
+	else {
+		updateBubbleVisibility("hidden", isChecked, filterName, value);
+	}	
+}
+
+/**
+ * Based on the input from the checkboxes, this function updates the
+ * visibility of the bubbles and either hides them or makes them visible.
  * 
  * @param {Object} classAttr check for element that has a class of "visible" or "hidden"
  * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
  * @param {Object} filterType can be genre_filter, rating_filter, or distributor_filter
  * @param {Object} category the actual category for which the checkbox corresponds
- * @param {Object} status1 update the class of the bubble to this value if conditions are met
- * @param {Object} status2 update the class of the bubble to this value if conditions aren't met
  */
-function filter(visibilityAttribute, checkboxInput, filterType, category, status1, status2) {
+function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, category) {
 	
 	var visibilityStatus;
 	
@@ -980,8 +1013,7 @@ function filter(visibilityAttribute, checkboxInput, filterType, category, status
 						else if (checkboxInput == true && d[filterType] == category && d.production_year == currYear) {
 							return "visible";
 						}
-						return "hidden";
-							    		
+						return "hidden";						    		
 		    	});
 		}
 	});
