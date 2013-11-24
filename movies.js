@@ -930,41 +930,83 @@ function unhighlightPoint(o) {
 /*
  * Filter for distributors.
  */
-function selectDistributor(value){
-	filterByDistributor(value, false);
-}
+function selectDistributor(value) {
 
-function filterByDistributor(value, bool) {
-	
+
 	var isChecked = document.getElementById(value).checked;
 	
-    d3.selectAll(".visible")
-    	.attr("cx", function(d) {
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    			return hiddenCoordinate;
-	    	}
-	    	if (d.production_year == currYear) {
-				return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
-			}
-			return hiddenCoordinate; 		
-    		
+	if (isChecked == false) {
+		filter(".visible", isChecked, "distributor_filter", value, "hidden", "visible");
+	}
+	else {
+		filter(".hidden", isChecked, "distributor_filter", value, "visible", "hidden");
+	}
+}
+
+/**
+ * Updates the visualization depending on the input for the checkboxes (filter).
+ * If the checkbox has been unchecked (i.e., it's false) look at "visible" bubbles 
+ * and see which ones match with the checkbox's category; make these elements 
+ * "hidden." Otherwise, only look at the "hidden" bubbles and see which ones match
+ * with the checkbox's category; make these elements "visible."
+ * 
+ * @param {Object} classAttr check for element that has a class of "visible" or "hidden"
+ * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
+ * @param {Object} filterType can be genre_filter, rating_filter, or distributor_filter
+ * @param {Object} category the actual category for which the checkbox corresponds
+ * @param {Object} status1 update the class of the bubble to this value if conditions are met
+ * @param {Object} status2 update the class of the bubble to this value if conditions aren't met
+ */
+function filter(classAttr, checkboxInput, filterType, category, status1, status2) {
+	
+    d3.selectAll(classAttr)
+    	.attr("cx", function(d, i) {
+    		return determinePosition(checkboxInput, d[filterType], category, d.production_year, 
+    								 bubbleXScale(new Date(currYear, d.month - 1, d.day))); 
+				    		
     	})
     	.attr("cy", function(d) {
-    		
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    		return hiddenCoordinate;
-	    	}
-	    	if (d.production_year == currYear) {
-				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
-			}
-			return hiddenCoordinate; 
+			return determinePosition(checkboxInput, d[filterType], category, d.production_year, 
+				                     bubbleYScale(d[yValues[indexCurrYValue]] / factor)); 
     	})
     	.attr("class", function(d) {
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    		return "hidden";
-	   		}
-	   		return "visible";	
+    		if (checkboxInput == false) {
+    			if (d[filterType] == category) {
+		    		return status1;
+		   		}
+		   		return status2;	
+    		}
+    		 
+    		else if (checkboxInput == true && d[filterType] == category && d.production_year == currYear) {
+		   		return status1;
+			}
+		   	return status2;	    			 		    	
     	});
 }
 
-
+/**
+ * Determine the new x or y-coordinate for points that are hidden/visible.
+ * Points that are hidden, get moved to (-100, -100).
+ * 
+ * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
+ * @param {Object} filterType actual value of the filter 
+ * @param {Object} category the actual category for which the checkbox corresponds
+ * @param {Object} year the year d3 is iterating through the data
+ * @param {Object} scaleValueType type of scale used (can be for the x or y axis)
+ */
+function determinePosition(checkboxInput, filterType, category, year, scaleValueType) {
+    if (checkboxInput == false) {
+    	if (filterType == category) {
+		    return hiddenCoordinate;
+		}
+		else if (year == currYear) {
+			return scaleValueType; 
+		}
+		return hiddenCoordinate; 
+    }
+    		
+    else if (checkboxInput == true && filterType == category && year == currYear) {
+		return scaleValueType;
+	}
+	return hiddenCoordinate;	
+}
