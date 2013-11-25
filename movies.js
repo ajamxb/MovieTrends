@@ -24,7 +24,14 @@ var filtersHeight = 800;
 var hiddenCoordinate = -100;
 
 // svg variables
-var svg, bubbleSvg, detailsSvg, lineSvg, barSvg;
+var svg, bubbleSvg, detailsSvg, lineSvg, barSvg, tooltipSvg;
+
+// tooltip div (location set based on mouse location when hovering over an element)
+var tooltipDiv;
+// tooltip dimensions
+var tooltipHeight = 40;
+var tooltipWidth = 100;
+var tooltipTextMargin = {side: 10, top: 17};
 
 // Details on demand space
 var detailsRect;
@@ -164,7 +171,19 @@ function setupLayout() {
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
 	
+	// create "tooltip" div and svg that will pop up next to mouse to display details-on-demand
+	tooltipDiv = d3.select("body")
+		.append("div")
+		.attr("id", "tooltipDiv")
+		.style("position","absolute")
+		.style("visibility","collapse");
 	
+	tooltipSvg = tooltipDiv.append("svg")
+			.attr("id", "tooltipSvg")
+			.attr("height", tooltipHeight)
+			.attr("width", tooltipWidth)
+			.attr("overflow","visible")
+			.style("opacity",0);
 }
 
 loadData(files[0]);
@@ -451,6 +470,138 @@ function removeDetails(className) {
 }
 
 
+// text variables to display movie data in d.o.d. when hovering over a bubble
+var tooltipTitle, tooltipGenre, tooltipYear, tooltipIncome;
+
+		
+/*
+ * display pop-up details next to mouse
+ * @author allichis
+ */
+function displayBubbleTooltipDetails(d) {
+	
+	tooltipDiv.style("visibility","visible");	
+	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
+    
+    tooltipTitle = tooltipSvg.append("svg:text")
+    	.attr("class", "tooltipTitle")
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top)
+		.text(d.title);
+	tooltipGenre = tooltipSvg.append("svg:text")
+		.attr("class", "tooltipText")
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top + 15)
+		.text(d.genre);
+	
+	/*
+	tooltipSvg.attr("width", function() {
+    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
+    						+ 2 * tooltipTextMargin.side;
+    			});
+    */
+   	tooltipSvg.attr("width",tooltipWidth * 2);
+   				
+	tooltipSvg.transition()        
+        .duration(200)      
+        .style("opacity", .7);
+        	
+}
+
+
+
+function displayBarTooltipDetails(d) {
+	
+	tooltipDiv.style("visibility","visible");
+	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
+    			     
+	tooltipYear = tooltipSvg.append("text")
+		.attr("class", "tooltipText")
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top)
+		.text(d.year);
+	tooltipIncome = tooltipSvg.append("text")
+		.attr("class", "tooltipText")
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top + 15)
+		.text(function() {
+			if(indexCurrYValue == 0) {
+				return incomeFormat(d.inflation_domestic_income)
+			}
+			else {
+				return incomeFormat(d.domestic_income)
+			}
+		});
+	
+	tooltipSvg.attr("width",100);
+		
+	tooltipSvg.transition()        
+        .duration(200)      
+        .style("opacity", .9);      
+	
+}
+
+/*
+function displayLineTooltipDetails(d) {
+	
+	tooltipDiv.style("visibility","visible");
+	tooltipDiv.style("left", (d3.event.pageX + 40) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY - 100) + "px");
+                 
+	tooltipGenre = tooltipSvg.append("text")
+		.attr("class", "tooltipText")
+		.attr("x",20)
+		.attr("y",20)
+		.text(d.genre);
+	tooltipYear = tooltipSvg.append("text")
+		.attr("class", "tooltipText")
+		.attr("x",20)
+		.attr("y",40)
+		.text(d.year);
+	tooltipIncome = tooltipSvg.append("text")
+		.attr("class", "tooltipText")
+		.attr("x",20)
+		.attr("y",60)
+		.text(function() {
+			if(indexCurrYValue == 0) {
+				return incomeFormat(d.inflation_domestic_income)
+			}
+			else {
+				return incomeFormat(d.domestic_income)
+			}
+		});
+	
+	tooltipSvg.attr("width", function() {
+    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
+    						+ 2 * tooltipTextMargin.side;
+    			});	
+	
+	tooltipDiv.transition()        
+        .duration(200)      
+        .style("opacity", .9);      
+
+}
+*/
+
+/*
+ * remove pop-up details
+ * @author allichis
+ */
+function removeTooltipDetails() {
+	
+	tooltipSvg.transition()        
+        .duration(200)      
+        .style("opacity", 0);
+        
+    tooltipSvg.selectAll("text").remove();
+    
+    tooltipDiv.style("visibility","collapse");
+}
+
+
+
 /*
  * Generates the bubble chart. 
  */
@@ -561,11 +712,13 @@ function generateBubbleGraph(){
 	                    .attr("opacity", 0.5);
 	            d3.select(this).moveToFront()
 	                	.attr("opacity", 1.0);
+	            displayBubbleTooltipDetails(d);
             })
             .on("mouseout", function(d) { 
             	d3.select(this.parentNode)
 	                	.selectAll("circle")
 	                    .attr("opacity", 1.0);
+	            removeTooltipDetails();
             })
             .on("click", function(d) {
             	if(movieDetailsOn){
@@ -728,7 +881,7 @@ function generateLineGraph(){
 						.on("mouseover", function(d) {
 							d3.select(this)
 								.attr("fill", barHighlightColor);
-							lineSvg.append("text")
+							/*lineSvg.append("text")
 									.attr("class", "barDetails")
 									.attr("x", chartWidth / 2)
 									.attr("y", 45)
@@ -736,9 +889,11 @@ function generateLineGraph(){
 									.text(function() { 
 										return d.year + " | " + incomeFormat(d.inflation_domestic_income); })
 									.style("font-size", "12px");
+							*/
+							displayBarTooltipDetails(d);
 						})
 						.on("mouseout", function(d) {
-							lineSvg.selectAll(".barDetails").remove();
+							//lineSvg.selectAll(".barDetails").remove();
 							if(d.year != currYear) {
 								d3.select(this)
 									.attr("fill", barColor);
@@ -747,6 +902,8 @@ function generateLineGraph(){
 								d3.select(this)
 									.attr("fill", barSelectedColor);
 							}
+							
+							removeTooltipDetails(d);
 						});
 	
 	// set up axes

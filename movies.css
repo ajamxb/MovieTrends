@@ -48,3 +48,21 @@ filter{
 	font-weight: bold;
 	color: black; 
 }
+
+
+#tooltipSvg {
+	border: .5px solid;
+	border-color: #000000;
+	background: #ffffff;
+}
+
+.tooltipText {
+	font-size: 12px;
+	font-family: Calibri;
+}
+
+.tooltipTitle {
+	font-size: 12px;
+	font-family: Calibri;
+	font-weight: bold;
+}
