@@ -654,6 +654,11 @@ function determineCurrentBarYLabel() {
 function updateBubbleGraph() {
 	bubbleSvg.selectAll("g").remove();
 	generateBubbleGraph();
+		
+	var distributors = document.getElementsByName("distributorFilter");
+	for (var i = 0; i < distributors.length; i++) {
+		selectDistributor(distributors[i].value);
+	}
 }
  
 
@@ -978,7 +983,6 @@ function selectDistributor(value) {
  *                 being filtered 
  */
 function filter(value, filterName) {
-	
 	var isChecked = document.getElementById(value).checked;
 	
 	if (isChecked == false) {
