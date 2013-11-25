@@ -503,7 +503,7 @@ function generateBubbleGraph(){
     			.attr("font-size", regTextSize);    					 
 			
 	var bubbles = bubbleSvg.append("g")
-						.attr("class", "bubbles")
+						.attr("class", "bubbleChartSvg")
 						/*
 						.on("click", function(d) {
 							if(movieDetailsOn) {
@@ -532,28 +532,28 @@ function generateBubbleGraph(){
 						
 
 			
-	bubbles.attr("class", "visible")
+	bubbles.attr("class", "bubble")
 			.attr("cx", function(d) {
-				if (d.production_year == currYear) {
-					return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
-				}
-				return hiddenCoordinate; 
+				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
-			.attr("cy", function (d) {
-				if (d.production_year == currYear) {
-					return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
-				}
-				return hiddenCoordinate;
+			.attr("cy", function(d) {
+				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
 			})
 			.attr("r", radius)
-			.attr("fill", function (d) {
+			.attr("fill", function(d) {
 				return genreColors[parseInt(d.genre1_index)];
 			})
-			.attr("stroke", function (d) {
+			.attr("stroke", function(d) {
 				if (d.genre2_index != "") {
 					return genreColors[parseInt(d.genre2_index)];
 				}
 				return genreColors[parseInt(d.genre1_index)];
+			})
+			.attr("visibility", function(d) {
+				if (d.production_year == currYear) {
+					return "visible"
+				}
+				return "hidden";				
 			})
 			.on("mouseover", function(d) { 
 				d3.select(this.parentNode)
@@ -864,7 +864,6 @@ function generateLineGraph(){
 				})
  				.attr("opacity", 0.0)
  				.style("stroke", function(d, i) { 
- 					console.log(genreName);
  					return genreColorKeyValue[genreName];
  				})
  				.style("stroke-width", 2)
@@ -925,6 +924,7 @@ function highlightPoint(o) {
 /*
  * Returns the point to its normal state when
  * the user is not hovering over it.
+ * 
  */
 function unhighlightPoint(o) {
 	d3.select(o)
@@ -933,44 +933,94 @@ function unhighlightPoint(o) {
 	d3.selectAll(".point").moveToFront();
 }
 
-/*
- * Filter for distributors.
+
+/**
+ * Filter for genres. This is the function that gets called when a 
+ * checkbox under the Genre category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
  */
-function selectDistributor(value){
-	filterByDistributor(value, false);
+function selectGenre(value) {
+	filter(value, "genre1");
+	filter(value, "genre2");
 }
 
-function filterByDistributor(value, bool) {
+/**
+ * Filter for ratings. This is the function that gets called when a 
+ * checkbox under the Rating category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ */
+function selectRating(value) {
+	filter(value, "rating");
+}
+
+/**
+ * Filter for distributors. This is the function that gets called when a 
+ * checkbox under the Distributor category gets checked/unchecked. This 
+ * function is hooked to the HTML.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ */
+function selectDistributor(value) {
+	filter(value, "distributor_filter");
+}
+
+
+/**
+ * Filter for the elements that get checked/uncked in the checkboxes.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @param {Object} filterName the name of the column in the dataset D3 will 
+ *                 use to see whether a bubble has the same category that is
+ *                 being filtered 
+ */
+function filter(value, filterName) {
 	
 	var isChecked = document.getElementById(value).checked;
 	
-    d3.selectAll(".visible")
-    	.attr("cx", function(d) {
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    			return hiddenCoordinate;
-	    	}
-	    	if (d.production_year == currYear) {
-				return bubbleXScale(new Date(currYear, d.month - 1, d.day)); 
-			}
-			return hiddenCoordinate; 		
-    		
-    	})
-    	.attr("cy", function(d) {
-    		
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    		return hiddenCoordinate;
-	    	}
-	    	if (d.production_year == currYear) {
-				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
-			}
-			return hiddenCoordinate; 
-    	})
-    	.attr("class", function(d) {
-	    	if (isChecked == bool && d.distributor_filter == value) {
-	    		return "hidden";
-	   		}
-	   		return "visible";	
-    	});
+	if (isChecked == false) {
+		updateBubbleVisibility("visible", isChecked, filterName, value);
+	}
+	else {
+		updateBubbleVisibility("hidden", isChecked, filterName, value);
+	}	
 }
 
-
+/**
+ * Based on the input from the checkboxes, this function updates the
+ * visibility of the bubbles and either hides them or makes them visible.
+ * 
+ * @param {Object} classAttr check for element that has a class of "visible" or "hidden"
+ * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
+ * @param {Object} filterType can be genre_filter, rating_filter, or distributor_filter
+ * @param {Object} category the actual category for which the checkbox corresponds
+ */
+function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, category) {
+	
+	var visibilityStatus;
+	
+	d3.selectAll(".bubble").each(function(d) {
+		visibilityStatus = d3.select(this).attr("visibility");
+		
+		if (visibilityStatus == visibilityAttribute) {
+			d3.select(this)
+		    	.attr("visibility", function(d) {
+						if (checkboxInput == false) {
+					    	if (d[filterType] == category || d.production_year != currYear) {
+							    return "hidden";
+							}
+							else {
+								return "visible";
+							}
+						}
+						else if (checkboxInput == true && d[filterType] == category && d.production_year == currYear) {
+							return "visible";
+						}
+						return "hidden";						    		
+		    	});
+		}
+	});
+}
