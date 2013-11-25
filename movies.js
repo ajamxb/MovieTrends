@@ -556,10 +556,16 @@ function generateBubbleGraph(){
 				return genreColors[parseInt(d.genre1_index)];
 			})
 			.on("mouseover", function(d) { 
-				
+				d3.select(this.parentNode)
+	                	.selectAll("circle")
+	                    .attr("opacity", 0.5);
+	            d3.select(this).moveToFront()
+	                	.attr("opacity", 1.0);
             })
             .on("mouseout", function(d) { 
-            	
+            	d3.select(this.parentNode)
+	                	.selectAll("circle")
+	                    .attr("opacity", 1.0);
             })
             .on("click", function(d) {
             	if(movieDetailsOn){
