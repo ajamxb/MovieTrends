@@ -694,10 +694,11 @@ function generateBubbleGraph(){
 	                    .attr("opacity", 1.0);
 	            removeTooltipDetails();
             })
-            /*.on("click", function(d) {
+            .on("click", function(d) {
+            	removeDetails("text.details");
+            	updateMovieDetails(d);
             	if(!movieDetailsOn){
             		movieDetailsOn = true;
-            		console.log("yo " + movieDetailsOn);
             		// show movie details
             		removeDetails("g.legend");
 					removeDetails("text.legend");
@@ -706,31 +707,13 @@ function generateBubbleGraph(){
 	                    .attr("opacity", 0.5);
 	                d3.select(this).moveToFront()
 	                	.attr("opacity", 1.0);
-	               	currDistributor = "Distributor: " + d.distributor;
-	               	currRating = "Rating: " + d.rating;
-	               	currGenre = "Genre: " + d.genre;
-	               	currTitle = d.title;
-	               	currBudget = "Production Budget: " + d.formatted_production_budget;
-	               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
-	               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
-	               	displayDetails();
-            	}
+	               	updateMovieDetails(d);
+            	}           	
             	else {
-	
-            	}
-            })*/
-			.attr("stroke-width", stroke);
-	
-			
-	d3.select("#bubbleChart")
-		.on("click", function(d) {
-				console.log("WOOOO");
-				if (d3.select(this).attr("class") == "whitespace" && movieDetailsOn) {
-					movieDetailsOn = false;  
-					console.log("ho " + movieDetailsOn);         
+					movieDetailsOn = false;          
 					d3.select(this)
 						.selectAll("circle")
-					    .attr("opacity", 1.0);
+				    	.attr("opacity", 1.0);
 					currDistributor = "";
 					currRating = "";
 					currGenre = "";
@@ -739,34 +722,64 @@ function generateBubbleGraph(){
 					currIncome = "";
 					currAdjustedIncome = "";
 					removeDetails("text.details");	
-					displayLegend();		
-				}
-				
-				else if (d3.select(this).attr("class") == "bubble" && !movieDetailsOn) {
-            		movieDetailsOn = true;
-            		console.log("yo " + movieDetailsOn);
-            		// show movie details
-            		removeDetails("g.legend");
-					removeDetails("text.legend");
-	            	d3.select(this.parentNode)
-	                	.selectAll("circle")
-	                    .attr("opacity", 0.5);
-	                d3.select(this).moveToFront()
-	                	.attr("opacity", 1.0);
-	               	currDistributor = "Distributor: " + d.distributor;
-	               	currRating = "Rating: " + d.rating;
-	               	currGenre = "Genre: " + d.genre;
-	               	currTitle = d.title;
-	               	currBudget = "Production Budget: " + d.formatted_production_budget;
-	               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
-	               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
-	               	displayDetails();
+					displayLegend();	
             	}
-	});
+            })
+			.attr("stroke-width", stroke);
+	
+	// If you click anywhere in the bubble chart after a circle is selected
+	// the DoD appearing for that circle in the DoD space will disappear		
+	d3.select(".whitespace")
+		.on("click", function(d) {
+			if (movieDetailsOn) {
+				movieDetailsOn = false;          
+				d3.select(this)
+					.selectAll("circle")
+				    .attr("opacity", 1.0);
+				currDistributor = "";
+				currRating = "";
+				currGenre = "";
+				currTitle = "";
+				currBudget = "";
+				currIncome = "";
+				currAdjustedIncome = "";
+				removeDetails("text.details");	
+				displayLegend();
+			}
+		});
 					
 	// draw graph title
 	drawBubbleGraphTitle();
 	
+}
+
+
+
+function updateMovieDetails(d) {
+	currDistributor = "Distributor: " + d.distributor;
+	currRating = "Rating: " + d.rating;
+	currGenre = "Genre: " + d.genre;
+	currTitle = d.title;
+	currBudget = "Production Budget: " + d.formatted_production_budget;
+	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
+	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
+	displayDetails();	
+}
+
+function clearMovieDetails() {
+	movieDetailsOn = false;           
+	d3.select(this)
+		.selectAll("circle")
+		.attr("opacity", 1.0);
+	currDistributor = "";
+	currRating = "";
+	currGenre = "";
+	currTitle = "";
+	currBudget = "";
+	currIncome = "";
+	currAdjustedIncome = "";
+	removeDetails("text.details");	
+	displayLegend();
 }
 
 /*
