@@ -759,7 +759,7 @@ function generateBubbleGraph(){
 	bubbleSvg.append("text")
 			.attr("class", "graphTitle")
 			.attr("x", chartWidth / 2)
-			.attr("y", 25)
+			.attr("y", 35)
 			.attr("text-anchor", "middle")
 			.text("U.S. Domestic Income for Top 25 Movies | " + currYear.toString());
 }
@@ -1028,7 +1028,7 @@ function generateLineGraph(){
 	lineSvg.append("text")
 			.attr("class", "graphTitle")
 			.attr("x", chartWidth / 2)
-			.attr("y", 25)
+			.attr("y", 35)
 			.attr("text-anchor", "middle")
 			.text("U.S. Total Domestic Income for Top 25 Movies per Year");
 }
