@@ -47,7 +47,7 @@ filter{
 
 
 #tooltipSvg {
-	border: .5px solid;
+	border: 1px solid;
 	border-color: #000000;
 	background: #ffffff;
 }
