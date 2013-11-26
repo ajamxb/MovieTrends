@@ -8,6 +8,17 @@ svg{
 	border-color: #d3d3d3;
 }
 
+ul {
+	text-decoration: none;
+	list-style: none;
+	font-family: Calibri;
+}
+
+filter {
+	font-family: Calibri;
+
+}
+
 .axis path, 
 .axis line {
     fill: none;
@@ -19,23 +30,12 @@ svg{
     font-family: sans-serif;
 }
 
-#details text{
+#details text {
 	font-family: sans-serif;
 }
 
-text.legend {
+.legend {
 	font-size: 12px;
-}
-
-ul{
-	text-decoration: none;
-	list-style: none;
-	font-family: Calibri;
-}
-filter{
-	
-	font-family: Calibri;
-
 }
 
 .graphTitle {
@@ -52,13 +52,14 @@ filter{
 	background: #ffffff;
 }
 
-.tooltipText {
+#tooltipSvg text{
 	font-size: 12px;
 	font-family: Calibri;
 }
+.tooltipText {
+	
+}
 
 .tooltipTitle {
-	font-size: 12px;
-	font-family: Calibri;
 	font-weight: bold;
 }
