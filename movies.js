@@ -469,10 +469,6 @@ function removeDetails(className) {
 	detailsSvg.selectAll(className).remove();
 }
 
-
-// text variables to display movie data in d.o.d. when hovering over a bubble
-var tooltipTitle, tooltipGenre, tooltipYear, tooltipIncome;
-
 		
 /*
  * display pop-up details next to mouse
@@ -484,12 +480,12 @@ function displayBubbleTooltipDetails(d) {
 	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
     tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
     
-    tooltipTitle = tooltipSvg.append("svg:text")
+    var tooltipTitle = tooltipSvg.append("svg:text")
     	.attr("class", "tooltipTitle")
 		.attr("x",tooltipTextMargin.side)
 		.attr("y",tooltipTextMargin.top)
 		.text(d.title);
-	tooltipGenre = tooltipSvg.append("svg:text")
+	var tooltipGenre = tooltipSvg.append("svg:text")
 		.attr("class", "tooltipText")
 		.attr("x",tooltipTextMargin.side)
 		.attr("y",tooltipTextMargin.top + 15)
@@ -517,12 +513,12 @@ function displayBarTooltipDetails(d) {
 	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
     tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
     			     
-	tooltipYear = tooltipSvg.append("text")
+	var tooltipYear = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
 		.attr("x",tooltipTextMargin.side)
 		.attr("y",tooltipTextMargin.top)
 		.text(d.year);
-	tooltipIncome = tooltipSvg.append("text")
+	var tooltipIncome = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
 		.attr("x",tooltipTextMargin.side)
 		.attr("y",tooltipTextMargin.top + 15)
@@ -539,51 +535,42 @@ function displayBarTooltipDetails(d) {
 		
 	tooltipSvg.transition()        
         .duration(200)      
-        .style("opacity", .9);      
+        .style("opacity", .7);      
 	
 }
 
-/*
-function displayLineTooltipDetails(d) {
+
+function displayLineTooltipDetails(d, genreName) {
 	
 	tooltipDiv.style("visibility","visible");
-	tooltipDiv.style("left", (d3.event.pageX + 40) + "px");     
-    tooltipDiv.style("top", (d3.event.pageY - 100) + "px");
+	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
                  
-	tooltipGenre = tooltipSvg.append("text")
+	var tooltipGenre = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
-		.attr("x",20)
-		.attr("y",20)
-		.text(d.genre);
-	tooltipYear = tooltipSvg.append("text")
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top)
+		.text(genreName);
+	var tooltipYearIncome = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
-		.attr("x",20)
-		.attr("y",40)
-		.text(d.year);
-	tooltipIncome = tooltipSvg.append("text")
-		.attr("class", "tooltipText")
-		.attr("x",20)
-		.attr("y",60)
-		.text(function() {
-			if(indexCurrYValue == 0) {
-				return incomeFormat(d.inflation_domestic_income)
-			}
-			else {
-				return incomeFormat(d.domestic_income)
-			}
-		});
+		.attr("x",tooltipTextMargin.side)
+		.attr("y",tooltipTextMargin.top + 15)
+		.text(d.year + " | " + incomeFormat(d[genreName]));
 	
+	/*
 	tooltipSvg.attr("width", function() {
     				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
     						+ 2 * tooltipTextMargin.side;
     			});	
+	*/
+	tooltipSvg.attr("width",tooltipWidth * 2)
 	
-	tooltipDiv.transition()        
+	tooltipSvg.transition()        
         .duration(200)      
-        .style("opacity", .9);      
+        .style("opacity", .7);      
 
 }
-*/
+
 
 /*
  * remove pop-up details
@@ -860,11 +847,11 @@ function generateLineGraph(){
 							return lineXScale(d.year) - barWidth / 2;
 						})
 						.attr("y", function(d) {
-							return lineYScale(d.inflation_domestic_income);
+							return lineYScale(d[yValues[indexCurrYValue]]);
 						})
 						.attr("width", barWidth)
 						.attr("height", function(d) {
-							return chartHeight - axisOffset - lineYValueScale(d.inflation_domestic_income);
+							return chartHeight - axisOffset - lineYValueScale(d[yValues[indexCurrYValue]]);
 						})
 						.attr("fill", function(d) {
 							if(d.year == currYear) return barSelectedColor;
@@ -1005,20 +992,22 @@ function generateLineGraph(){
 				.attr("cy", function(d) { return lineYValueScale(d[genreName]); })
 				.attr("r", 5)
 				.on("mouseover", function(d) {
-					removeDetails("g.legend");
-					removeDetails("text.legend");
-					year = d.year;
-					currGenre = "Genres: " + genreName;
-					currIncome = "Income: " + incomeFormat(d[genreName]);
+					//removeDetails("g.legend");
+					//removeDetails("text.legend");
+					//year = d.year;
+					//currGenre = genreName;
+					//currIncome = incomeFormat(d[genreName]);
 					highlightPoint(this);
 					highlightLine(thisLine);
-					displayPointDetails();
+					//displayPointDetails();
+					displayLineTooltipDetails(d,genreName);
 				})
 				.on("mouseout", function(d) {
-					displayLegend(); 
+					//displayLegend(); 
 					unhighlightPoint(this);
 					unhighlightLine(thisLine);
-					removeDetails("text.details");
+					//removeDetails("text.details");
+					removeTooltipDetails();
 				})
 				.on("click", function(d) { 
 					currYear = d.year; 
