@@ -714,15 +714,7 @@ function generateBubbleGraph(){
 					d3.select(this)
 						.selectAll("circle")
 				    	.attr("opacity", 1.0);
-					currDistributor = "";
-					currRating = "";
-					currGenre = "";
-					currTitle = "";
-					currBudget = "";
-					currIncome = "";
-					currAdjustedIncome = "";
-					removeDetails("text.details");	
-					displayLegend();	
+					clearMovieDetails();	
             	}
             })
 			.attr("stroke-width", stroke);
@@ -736,15 +728,7 @@ function generateBubbleGraph(){
 				d3.select(this)
 					.selectAll("circle")
 				    .attr("opacity", 1.0);
-				currDistributor = "";
-				currRating = "";
-				currGenre = "";
-				currTitle = "";
-				currBudget = "";
-				currIncome = "";
-				currAdjustedIncome = "";
-				removeDetails("text.details");	
-				displayLegend();
+				clearMovieDetails();
 			}
 		});
 					
@@ -767,10 +751,7 @@ function updateMovieDetails(d) {
 }
 
 function clearMovieDetails() {
-	movieDetailsOn = false;           
-	d3.select(this)
-		.selectAll("circle")
-		.attr("opacity", 1.0);
+
 	currDistributor = "";
 	currRating = "";
 	currGenre = "";
