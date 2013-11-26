@@ -32,6 +32,8 @@ var tooltipDiv;
 var tooltipHeight = 40;
 var tooltipWidth = 100;
 var tooltipTextMargin = {side: 10, top: 17};
+var tooltipXOffset = 10;
+var tooltipYOffset = -50;
 
 // Details on demand space
 var detailsRect;
@@ -75,7 +77,7 @@ var indexCurrYValue = 0;
 var yValues = ["inflation_domestic_income", "domestic_income"];
 
 var axisOffset = 65;
-var axisLabelMargin = 55;
+var axisLabelMargin = 50;
 var axisLabelWidth = 50;
 
 // Radius of a bubble
@@ -477,8 +479,8 @@ function removeDetails(className) {
 function displayBubbleTooltipDetails(d) {
 	
 	tooltipDiv.style("visibility","visible");	
-	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
-    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
+	tooltipDiv.style("left", (d3.event.pageX + tooltipXOffset) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY + tooltipYOffset) + "px");
     
     var tooltipTitle = tooltipSvg.append("svg:text")
     	.attr("class", "tooltipTitle")
@@ -510,8 +512,8 @@ function displayBubbleTooltipDetails(d) {
 function displayBarTooltipDetails(d) {
 	
 	tooltipDiv.style("visibility","visible");
-	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
-    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
+	tooltipDiv.style("left", (d3.event.pageX + tooltipXOffset) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY + tooltipYOffset) + "px");
     			     
 	var tooltipYear = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
@@ -543,8 +545,8 @@ function displayBarTooltipDetails(d) {
 function displayLineTooltipDetails(d, genreName) {
 	
 	tooltipDiv.style("visibility","visible");
-	tooltipDiv.style("left", (d3.event.pageX + 10) + "px");     
-    tooltipDiv.style("top", (d3.event.pageY - 55) + "px");
+	tooltipDiv.style("left", (d3.event.pageX + tooltipXOffset) + "px");     
+    tooltipDiv.style("top", (d3.event.pageY + tooltipYOffset) + "px");
                  
 	var tooltipGenre = tooltipSvg.append("text")
 		.attr("class", "tooltipText")
