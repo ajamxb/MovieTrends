@@ -279,7 +279,7 @@ function generateDetails() {
 
 /*
  * Displays the key for both the bubble and line charts.
- * @author ajam 
+ * @author Annette Almonte 
  */
 function displayLegend() {
 	
@@ -290,7 +290,7 @@ function displayLegend() {
 /*
  * Creates the color swatches and corresponding text for 
  * the bubble chart key.
- * @author ajam
+ * @author Annette Almonte
  */
 function displayBubbleChartKey() {
 	
@@ -341,7 +341,7 @@ function displayColorSwatch(index, cx, cy, radius, fill) {
 /*
  * Creates the color swatches and corresponding text for 
  * the line chart key.
- * @author ajam
+ * @author Annette Almonte
  */
 function displayLineChartKey() {
 	
@@ -382,7 +382,7 @@ function displayLineChartKey() {
 
 /*
  * Creates a line swatch for the line graph key.
- * @author ajam
+ * @author Annette Almonte
  */
 function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
 	
@@ -398,7 +398,7 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
 /*
  * Displays the data pertaining to a movie when a user
  * hovers over a bubble.
- * @author ajam 
+ * @author Annette Almonte 
  */
 function displayDetails() {
 	
@@ -452,7 +452,7 @@ function displayPointDetails() {
 
 /*
  * Function used to add the text for the DoD.
- * @author ajam 
+ * @author Annette Almonte 
  */
 function addText(classAttr, x, y, textAnchor, text) {
     detailsSvg.append("svg:text")
@@ -465,7 +465,7 @@ function addText(classAttr, x, y, textAnchor, text) {
 
 /*
  * Removes the data displayed in the DoD area.
- * @author ajam
+ * @author Annette Almonte
  */
 function removeDetails(className) {
 	detailsSvg.selectAll(className).remove();
@@ -596,6 +596,14 @@ function removeTooltipDetails() {
  */
 function generateBubbleGraph(){
 
+	bubbleSvg.append("rect")
+				.attr("class", "whitespace")
+				.attr("x", "0")
+				.attr("y", "0")
+				.attr("width", chartWidth)
+				.attr("height", chartHeight)
+				.attr("fill", "rgb(255, 255, 255)");
+				
 	// Setup the scales
 	bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
@@ -619,59 +627,36 @@ function generateBubbleGraph(){
 						.tickFormat(function(d) { return incomeFormat(d); });
 					
 	bubbleSvg.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(0," + (chartHeight - axisOffset) + ")")
-		.call(bubbleXAxis)
-		.append("text")
-		.attr("text-anchor","middle")
-		.attr("x", chartWidth / 2)
-		.attr("y", axisLabelMargin - 12)
-		.text("Movie Release Date");
+				.attr("class", "axis")
+				.attr("transform", "translate(0," + (chartHeight - axisOffset) + ")")
+				.call(bubbleXAxis)
+				.append("text")
+				.attr("text-anchor","middle")
+				.attr("x", chartWidth / 2)
+				.attr("y", axisLabelMargin - 12)
+				.text("Movie Release Date");
 	
 	bubbleSvg.append("g")
-		.attr("class", "axis")
-		.attr("transform", "translate(" + axisOffset + ", 0)")
-		.call(bubbleYAxis)
-		.append("text")
-		.attr("text-anchor","middle")
-		.attr("transform","rotate(-90)")
-		.attr("x", -(chartHeight) / 2)
-        .attr("y", -axisLabelMargin)
-        .text(determineCurrentLabel());	 
+				.attr("class", "axis")
+				.attr("transform", "translate(" + axisOffset + ", 0)")
+				.call(bubbleYAxis)
+				.append("text")
+				.attr("text-anchor","middle")
+				.attr("transform","rotate(-90)")
+				.attr("x", -(chartHeight) / 2)
+        		.attr("y", -axisLabelMargin)
+        		.text(determineCurrentLabel());	 
     
     bubbleSvg.selectAll("text")
     			.attr("font-size", regTextSize);    					 
 			
 	var bubbles = bubbleSvg.append("g")
-						.attr("class", "bubbleChartSvg")
-						/*
-						.on("click", function(d) {
-							if(movieDetailsOn) {
-								movieDetailsOn = false;
-								console.log("g " + movieDetailsOn);
-			            		// hide move details
-			            		displayLegend();
-				                d3.select(this.parentNode)
-				                	.selectAll("circle")
-				                    .attr("opacity", 1.0);
-				               	currDistributor = "";
-				               	currRating = "";
-				               	currGenre = "";
-				               	currTitle = "";
-				               	currBudget = "";
-				               	currIncome = "";
-				               	currAdjustedIncome = "";
-				               	removeDetails("text.details");
-				            }
-						})
-						*/
-						.selectAll("circle")
-						.data(moviesDataset)
-						.enter()
-						.append("circle");
-						
-
-			
+							.attr("class", "bubbleChartSvg")
+							.selectAll("circle")
+							.data(moviesDataset)
+							.enter()
+							.append("circle");
+		
 	bubbles.attr("class", "bubble")
 			.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
@@ -709,27 +694,10 @@ function generateBubbleGraph(){
 	                    .attr("opacity", 1.0);
 	            removeTooltipDetails();
             })
-            .on("click", function(d) {
-            	if(movieDetailsOn){
-            		movieDetailsOn = false;
-            		//console.log("c " + movieDetailsOn);
-            		// hide move details
-            		displayLegend();
-	                d3.select(this.parentNode)
-	                	.selectAll("circle")
-	                    .attr("opacity", 1.0);
-	               	currDistributor = "";
-	               	currRating = "";
-	               	currGenre = "";
-	               	currTitle = "";
-	               	currBudget = "";
-	               	currIncome = "";
-	               	currAdjustedIncome = "";
-	               	removeDetails("text.details");
-            	}
-            	else {
+            /*.on("click", function(d) {
+            	if(!movieDetailsOn){
             		movieDetailsOn = true;
-            		//console.log("c " + movieDetailsOn);
+            		console.log("yo " + movieDetailsOn);
             		// show movie details
             		removeDetails("g.legend");
 					removeDetails("text.legend");
@@ -747,24 +715,65 @@ function generateBubbleGraph(){
 	               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
 	               	displayDetails();
             	}
-            })
+            	else {
+	
+            	}
+            })*/
 			.attr("stroke-width", stroke);
+	
 			
+	d3.select("#bubbleChart")
+		.on("click", function(d) {
+				console.log("WOOOO");
+				if (d3.select(this).attr("class") == "whitespace" && movieDetailsOn) {
+					movieDetailsOn = false;  
+					console.log("ho " + movieDetailsOn);         
+					d3.select(this)
+						.selectAll("circle")
+					    .attr("opacity", 1.0);
+					currDistributor = "";
+					currRating = "";
+					currGenre = "";
+					currTitle = "";
+					currBudget = "";
+					currIncome = "";
+					currAdjustedIncome = "";
+					removeDetails("text.details");	
+					displayLegend();		
+				}
+				
+				else if (d3.select(this).attr("class") == "bubble" && !movieDetailsOn) {
+            		movieDetailsOn = true;
+            		console.log("yo " + movieDetailsOn);
+            		// show movie details
+            		removeDetails("g.legend");
+					removeDetails("text.legend");
+	            	d3.select(this.parentNode)
+	                	.selectAll("circle")
+	                    .attr("opacity", 0.5);
+	                d3.select(this).moveToFront()
+	                	.attr("opacity", 1.0);
+	               	currDistributor = "Distributor: " + d.distributor;
+	               	currRating = "Rating: " + d.rating;
+	               	currGenre = "Genre: " + d.genre;
+	               	currTitle = d.title;
+	               	currBudget = "Production Budget: " + d.formatted_production_budget;
+	               	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
+	               	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
+	               	displayDetails();
+            	}
+	});
+					
 	// draw graph title
-	bubbleSvg.selectAll(".graphTitle").remove();
-	bubbleSvg.append("text")
-			.attr("class", "graphTitle")
-			.attr("x", chartWidth / 2)
-			.attr("y", 35)
-			.attr("text-anchor", "middle")
-			.text("U.S. Domestic Income for Top 25 Movies | " + currYear.toString());
+	drawBubbleGraphTitle();
+	
 }
 
 /*
  * Determines the label for the y-axes based on what mode (adjusted income or
  * actual domestic income) the user is in.
  * 
- * @author ajam
+ * @author Annette Almonte
  */      
 function determineCurrentLabel() {
 	if (indexCurrYValue == 0) {
@@ -784,11 +793,26 @@ function determineCurrentBarYLabel() {
 	return "Income (billions USD)";
 }
 
-/*
+
+function drawBubbleGraphTitle() {
+	bubbleSvg.selectAll(".graphTitle").remove();
+	bubbleSvg.append("text")
+		.attr("class", "graphTitle")
+		.attr("x", chartWidth / 2)
+		.attr("y", 35)
+		.attr("text-anchor", "middle")
+		.text("U.S. Adjusted Domestic Income for Top 25 Movies | " + currYear.toString());	
+}
+
+/**
  * Updates bubble graph to display current selected year with the filtered
  * components.
+ * 
+ * @author Annette Almonte
  */
 function updateBubbleGraph() {
+	drawBubbleGraphTitle();
+		
 	d3.selectAll(".bubble")
 		.attr("visibility", function(d) {
 			if (d.production_year == currYear) {
@@ -1053,7 +1077,7 @@ function generateLineGraph(){
 			.attr("x", chartWidth / 2)
 			.attr("y", 35)
 			.attr("text-anchor", "middle")
-			.text("U.S. Total Domestic Income for Top 25 Movies per Year");
+			.text("U.S. Total Adjusted Domestic Income for Top 25 Movies per Year");
 }
 
 
