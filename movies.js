@@ -691,7 +691,7 @@ function generateBubbleGraph(){
 			})
 			.attr("visibility", function(d) {
 				if (d.production_year == currYear) {
-					return "visible"
+					return "visible";
 				}
 				return "hidden";				
 			})
@@ -748,13 +748,7 @@ function generateBubbleGraph(){
 	               	displayDetails();
             	}
             })
-			.attr("stroke-width", stroke)
-			.attr("opacity", function (d) {
-				if (d.production_year != currYear){
-					return 0.0;
-				}
-				return 1.0;
-			});
+			.attr("stroke-width", stroke);
 			
 	// draw graph title
 	bubbleSvg.selectAll(".graphTitle").remove();
@@ -791,15 +785,39 @@ function determineCurrentBarYLabel() {
 }
 
 /*
- * Updates bubble graph to display current selected year
+ * Updates bubble graph to display current selected year with the filtered
+ * components.
  */
 function updateBubbleGraph() {
-	bubbleSvg.selectAll("g").remove();
-	generateBubbleGraph();
+	d3.selectAll(".bubble")
+		.attr("visibility", function(d) {
+			if (d.production_year == currYear) {
+				return "visible";
+			}
+			return "hidden";				
+		});
+	
+	updateFilter("genreFilter", selectGenre);
+	updateFilter("ratingFilter", selectRating);
+	updateFilter("distributorFilter", selectDistributor);
 		
-	var distributors = document.getElementsByName("distributorFilter");
-	for (var i = 0; i < distributors.length; i++) {
-		selectDistributor(distributors[i].value);
+}
+
+/**
+ * Iterates through all the categories that have been unchecked and updates
+ * the filtered selection.
+ * 
+ * @param {Object} filterName the name of the filter based on its HTML "name" attribute
+ * @param {Object} filteringFunction filter function that will be used depending on the 
+ *                 kind of data that's being filtered (genre, rating, or distributor)
+ * @author Annette Almonte 
+ */
+function updateFilter(filterName, filteringFunction) {
+	var categories = document.getElementsByName(filterName);
+	for (var i = 0; i < categories.length; i++) {
+		if (document.getElementById(categories[i].value).checked == false) {
+			filteringFunction(categories[i].value);
+		}
 	}
 }
  
@@ -863,9 +881,12 @@ function generateLineGraph(){
 							d3.selectAll(".bar")
 								.attr("fill", barColor);
 							d3.select(this)
-								.attr("fill", barSelectedColor);
-							currYear = d.year;
-							updateBubbleGraph();
+								//.attr("fill", barSelectedColor);
+								.attr("fill", function(d) {
+									currYear = d.year;
+									updateBubbleGraph();
+									return barSelectedColor;
+								});
 						})
 						.on("mouseover", function(d) {
 							d3.select(this)
@@ -1129,6 +1150,7 @@ function selectDistributor(value) {
  * @param {Object} filterName the name of the column in the dataset D3 will 
  *                 use to see whether a bubble has the same category that is
  *                 being filtered 
+ * @author Annette Almonte 
  */
 function filter(value, filterName) {
 	var isChecked = document.getElementById(value).checked;
@@ -1149,6 +1171,8 @@ function filter(value, filterName) {
  * @param {Object} checkboxInput the inputted value of the checkbox (true or false)
  * @param {Object} filterType can be genre_filter, rating_filter, or distributor_filter
  * @param {Object} category the actual category for which the checkbox corresponds
+ * 
+ * @author Annette Almonte 
  */
 function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, category) {
 	
