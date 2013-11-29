@@ -81,8 +81,7 @@ var axisLabelMargin = 50;
 var axisLabelWidth = 50;
 
 // Radius of a bubble
-var radius = 7;
-var stroke = 4;
+var radius = 9;
 
 var bubbleXScale;
 var bubbleYScale;
@@ -333,7 +332,7 @@ function displayColorSwatch(index, cx, cy, radius, fill) {
 	detailsSvg.select("#colorSwatch" + String(index))
 	    		.attr("cx", cx)
 	    		.attr("cy", cy)
-	    		.attr("r", radius + 2)
+	    		.attr("r", radius)
 	    		.attr("fill", fill);
 	
 }
@@ -655,10 +654,11 @@ function generateBubbleGraph(){
 							.selectAll("circle")
 							.data(moviesDataset)
 							.enter()
+							.append("g")
+							.attr("class", "bubble")
 							.append("circle");
 		
-	bubbles.attr("class", "bubble")
-			.attr("cx", function(d) {
+	bubbles.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
 			.attr("cy", function(d) {
@@ -668,56 +668,82 @@ function generateBubbleGraph(){
 			.attr("fill", function(d) {
 				return genreColors[parseInt(d.genre1_index)];
 			})
-			.attr("stroke", function(d) {
-				if (d.genre2_index != "") {
-					return genreColors[parseInt(d.genre2_index)];
-				}
-				return genreColors[parseInt(d.genre1_index)];
-			})
 			.attr("visibility", function(d) {
 				if (d.production_year == currYear) {
 					return "visible";
 				}
 				return "hidden";				
-			})
-			.on("mouseover", function(d) { 
-				d3.select(this.parentNode)
-	                	.selectAll("circle")
-	                    .attr("opacity", 0.5);
-	            d3.select(this).moveToFront()
-	                	.attr("opacity", 1.0);
-	            displayBubbleTooltipDetails(d);
+			});
+			
+	arc = d3.svg.arc()
+			.innerRadius(0)
+			.outerRadius(radius)
+			.startAngle(0)
+			.endAngle(Math.PI);
+	
+	bubbleSvg.selectAll(".bubble")
+			 .append("path")	
+			 .attr("d", arc)
+			 .attr("fill", function(d) {
+			 	if (d.genre2_index != "") {
+					return genreColors[parseInt(d.genre2_index)];
+				}
+				return genreColors[parseInt(d.genre1_index)]
+			  })
+			  .attr("transform", function(d) { 
+			      return "translate("+ bubbleXScale(new Date(currYear, d.month - 1, d.day)) + "," 
+				                     + bubbleYScale(d[yValues[indexCurrYValue]] / factor) + ")";
+			  })
+			  .attr("visibility", function(d) {
+			      if (d.production_year == currYear) {
+				      return "visible";
+				  }
+					  return "hidden";				
+			  });
+	            
+	bubbleSvg.selectAll(".bubble")
+		.on("mouseover", function(d) { 
+				if (!movieDetailsOn) {
+					d3.selectAll(".bubble")
+		                    .attr("opacity", 0.5);
+		            d3.select(this).moveToFront()
+		                	.attr("opacity", 1.0);
+		            displayBubbleTooltipDetails(d);					
+				}
             })
             .on("mouseout", function(d) { 
-            	d3.select(this.parentNode)
-	                	.selectAll("circle")
-	                    .attr("opacity", 1.0);
-	            removeTooltipDetails();
+            	if (!movieDetailsOn) {
+	            	d3.selectAll(".bubble")
+		                    .attr("opacity", 1.0);
+		            removeTooltipDetails();            		
+            	}
             })
-            .on("click", function(d) {
+            .on("click", function(d) {          	
             	removeDetails("text.details");
-            	updateMovieDetails(d);
+            	//updateMovieDetails(d);
             	if(!movieDetailsOn){
+            		removeTooltipDetails();
             		movieDetailsOn = true;
             		// show movie details
             		removeDetails("g.legend");
 					removeDetails("text.legend");
-	            	d3.select(this.parentNode)
-	                	.selectAll("circle")
+	            	d3.selectAll(".bubble")
 	                    .attr("opacity", 0.5);
 	                d3.select(this).moveToFront()
 	                	.attr("opacity", 1.0);
 	               	updateMovieDetails(d);
             	}           	
             	else {
-					movieDetailsOn = false;          
-					d3.select(this)
-						.selectAll("circle")
+
+					movieDetailsOn = false; 
+					         
+					d3.selectAll(".bubble")
 				    	.attr("opacity", 1.0);
 					clearMovieDetails();	
+					
             	}
-            })
-			.attr("stroke-width", stroke);
+            });
+	
 	
 	// If you click anywhere in the bubble chart after a circle is selected
 	// the DoD appearing for that circle in the DoD space will disappear		
@@ -725,8 +751,7 @@ function generateBubbleGraph(){
 		.on("click", function(d) {
 			if (movieDetailsOn) {
 				movieDetailsOn = false;          
-				d3.select(this)
-					.selectAll("circle")
+				d3.selectAll(".bubble")
 				    .attr("opacity", 1.0);
 				clearMovieDetails();
 			}
@@ -808,6 +833,16 @@ function updateBubbleGraph() {
 	drawBubbleGraphTitle();
 		
 	d3.selectAll(".bubble")
+		.selectAll("circle")
+		.attr("visibility", function(d) {
+			if (d.production_year == currYear) {
+				return "visible";
+			}
+			return "hidden";				
+		});
+	
+	d3.selectAll(".bubble")
+		.selectAll("path")
 		.attr("visibility", function(d) {
 			if (d.production_year == currYear) {
 				return "visible";
