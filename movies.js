@@ -702,47 +702,42 @@ function generateBubbleGraph(){
 			  });
 	            
 	bubbleSvg.selectAll(".bubble")
-		.on("mouseover", function(d) { 
-				if (!movieDetailsOn) {
-					d3.selectAll(".bubble")
-		                    .attr("opacity", 0.5);
+				.on("mouseover", function(d) { 
+					if (!movieDetailsOn) {
+						d3.selectAll(".bubble")
+			                    .attr("opacity", 0.5);
+			            d3.select(this).moveToFront()
+			                	.attr("opacity", 1.0);
+			            displayBubbleTooltipDetails(d);					
+					}
+	            })
+	            .on("mouseout", function(d) { 
+	            	if (!movieDetailsOn) {
+		            	d3.selectAll(".bubble")
+			                    .attr("opacity", 1.0);
+			            removeTooltipDetails();            		
+	            	}
+	            })
+	            .on("click", function(d) { 
+	            	// Remove the legend if it was previously displayed
+	            	if (!movieDetailsOn) {
+	            		removeDetails("g.legend");
+						removeDetails("text.legend");    			
+	           		}
+	           		
+	           		// Removes details for previously selected movie         	
+	            	removeDetails("text.details"); 
+	            	
+	            	// Removes the tooltip for the movies
+	            	removeTooltipDetails(); 
+	            	movieDetailsOn = true;
+	
+		            d3.selectAll(".bubble")
+		            	.attr("opacity", 0.5);
 		            d3.select(this).moveToFront()
-		                	.attr("opacity", 1.0);
-		            displayBubbleTooltipDetails(d);					
-				}
-            })
-            .on("mouseout", function(d) { 
-            	if (!movieDetailsOn) {
-	            	d3.selectAll(".bubble")
-		                    .attr("opacity", 1.0);
-		            removeTooltipDetails();            		
-            	}
-            })
-            .on("click", function(d) {          	
-            	removeDetails("text.details");
-            	//updateMovieDetails(d);
-            	if(!movieDetailsOn){
-            		removeTooltipDetails();
-            		movieDetailsOn = true;
-            		// show movie details
-            		removeDetails("g.legend");
-					removeDetails("text.legend");
-	            	d3.selectAll(".bubble")
-	                    .attr("opacity", 0.5);
-	                d3.select(this).moveToFront()
-	                	.attr("opacity", 1.0);
-	               	updateMovieDetails(d);
-            	}           	
-            	else {
-
-					movieDetailsOn = false; 
-					         
-					d3.selectAll(".bubble")
-				    	.attr("opacity", 1.0);
-					clearMovieDetails();	
-					
-            	}
-            });
+		                .attr("opacity", 1.0);
+		            updateMovieDetails(d);
+	            });
 	
 	
 	// If you click anywhere in the bubble chart after a circle is selected
