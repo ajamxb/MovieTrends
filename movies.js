@@ -123,6 +123,9 @@ var year, currDistributor, currRating, currGenre, currTitle, currBudget, currInc
 // boolean to let us know if movie details are currently being displayed
 var movieDetailsOn = false;
 
+// which genre line is currently selected
+var lineSelected = null;
+
 // formats dollar amount with dollar sign and commas							        
 var incomeFormat = d3.format("$,f");
 	
@@ -473,6 +476,7 @@ function removeDetails(className) {
 		
 /*
  * display pop-up details next to mouse
+ * when hovering over a bubble
  * @author allichis
  */
 function displayBubbleTooltipDetails(d) {
@@ -507,7 +511,11 @@ function displayBubbleTooltipDetails(d) {
 }
 
 
-
+/*
+ * display pop-up details next to mouse
+ * when hovering over a bar
+ * @author allichis
+ */
 function displayBarTooltipDetails(d) {
 	
 	tooltipDiv.style("visibility","visible");
@@ -540,7 +548,11 @@ function displayBarTooltipDetails(d) {
 	
 }
 
-
+/*
+ * display pop-up details next to mouse
+ * when hovering over a data point on a genre line
+ * @author allichis
+ */
 function displayLineTooltipDetails(d, genreName) {
 	
 	tooltipDiv.style("visibility","visible");
@@ -876,6 +888,21 @@ function updateFilter(filterName, filteringFunction) {
  */
 function generateLineGraph(){
 	
+	lineSvg.append("rect")
+				.attr("class", "whitespace")
+				.attr("x", "0")
+				.attr("y", "0")
+				.attr("width", chartWidth)
+				.attr("height", chartHeight)
+				.attr("fill", "rgb(255, 255, 255)")
+				.on("click", function(d) {
+					if (lineSelected != null) {
+						lineSelected = null;          
+						unhighlightPoints();
+						unhighlightLines();
+					}
+				});
+	
 	// setup axis scales
 	var maxIncome = 6500000000;
 	//var maxIncomeInflation = d3.max(genreGroupsIncomeInflationDataset);
@@ -935,6 +962,9 @@ function generateLineGraph(){
 									updateBubbleGraph();
 									return barSelectedColor;
 								});
+							lineSelected = null;
+				      		unhighlightLines();
+				      		unhighlightPoints();
 						})
 						.on("mouseover", function(d) {
 							d3.select(this)
@@ -1020,16 +1050,30 @@ function generateLineGraph(){
 						    	.append("g")
 						      	.attr("class", "genreLine");
 	
-						      	
+					      	
 	genreLines.append("path")
 		  .attr("id", function(d) { return d.name + " Line"; })
 	      .attr("class", "line")
 	      .attr("d", function(d) { return line(d.values); })
 	      .on("mouseover", function(d) { 
-	      	highlightLine(d3.select(this));
+	      	if(lineSelected == null) {
+	      		highlightLine(this);
+	      	}
 	      })
-	      .on("mouseout", function(d) { 
-	      	unhighlightLine(d3.select(this)); 
+	      .on("mouseout", function(d) {
+	      	if(lineSelected == null) { 
+	      		unhighlightLines(); 
+	      	}
+	      })
+	      .on("click", function(d) {
+	      	if(lineSelected == null) {
+	      		selectLine(this);
+	      	}
+	      	else {
+	      		lineSelected = null;
+	      		unhighlightLines();
+	      		unhighlightPoints();
+	      	}
 	      })
 	      .style("stroke", function(d) { 
 	      	return genreColorKeyValue[d.name]; 
@@ -1044,7 +1088,7 @@ function generateLineGraph(){
     genreLines.each(
     	function (d) { 
     		var genreName = d.name;
-    		var thisLine = d3.select(this).select("path");
+    		var thisLine = this;
 			d3.select(this)
 				.append("g")
 				.attr("class", "genrePoints")
@@ -1063,18 +1107,31 @@ function generateLineGraph(){
 				.attr("cy", function(d) { return lineYValueScale(d[genreName]); })
 				.attr("r", 5)
 				.on("mouseover", function(d) {
-					highlightPoint(this);
-					highlightLine(thisLine);
-					displayLineTooltipDetails(d,genreName);
+					if(lineSelected == null) {
+						highlightPoint(this);
+						highlightLine(thisLine);
+						displayLineTooltipDetails(d,genreName);
+					}
+					else if(lineSelected == thisLine) {
+						displayLineTooltipDetails(d,genreName);
+					}
 				})
 				.on("mouseout", function(d) {
-					unhighlightPoint(this);
-					unhighlightLine(thisLine);
+					if(lineSelected == null) {
+						unhighlightPoints();
+						unhighlightLines();
+					}
 					removeTooltipDetails();
 				})
-				.on("click", function(d) { 
-					currYear = d.year; 
-					updateBubbleGraph(); 
+				.on("click", function(d) {
+					if(lineSelected == null){ 
+						selectLine(thisLine); 
+					}
+					else {
+						lineSelected = null;
+						unhighlightPoints();
+						unhighlightLines();
+					}
 				})
  				.attr("opacity", 0.0)
  				.style("stroke", function(d, i) { 
@@ -1096,6 +1153,19 @@ function generateLineGraph(){
 			.text("U.S. Total Adjusted Domestic Income for Top 25 Movies per Year");
 }
 
+/*
+ * "Selects" the line that was clicked.
+ * Highlights the line (even when mouse moves away)
+ * and highlights all the points on that line.
+ */
+function selectLine(o) {	
+	lineSelected = o;
+	highlightLine(o);
+	d3.select(o).select(".genrePoints")
+			.each( function(d) { 
+					highlightPoint(this); 
+			});
+}
 
 /*
  * Highlights the line that's being hovered over.
@@ -1103,32 +1173,29 @@ function generateLineGraph(){
 function highlightLine(o) {
 	d3.selectAll(".line")
 		.transition()        
-        .duration(200)
+        .duration(100)
         .attr("opacity", 0.2);
-	      		
-	d3.select(this.parentNode).moveToFront();
 	
-	o.transition()        
-        .duration(200)
+	d3.select(o)
+		.transition()        
+        .duration(100)
         .attr("opacity", 1.0)
 		.style("stroke-width",4);
-			
+		
+	d3.select(o.parentNode).moveToFront();			
 }
 
 /*
  * Returns all of the lines to their normal state when
  * the user is not hovering over any of them.
  */
-function unhighlightLine(o) {
+function unhighlightLines() {
 	d3.selectAll(".line")
 		.transition()        
         .duration(200)
-	    .attr("opacity", 1.0);
+	    .attr("opacity", 1.0)
+	    .style("stroke-width",2);
 	    
-	o.transition()        
-        .duration(200)
-        .style("stroke-width",2);
-		
 }
 
 /*
@@ -1147,8 +1214,8 @@ function highlightPoint(o) {
  * the user is not hovering over it.
  * 
  */
-function unhighlightPoint(o) {
-	d3.select(o)
+function unhighlightPoints() {
+	d3.selectAll(".point")
 		.transition()        
         .duration(200)
 		.attr("opacity", 0.0);
