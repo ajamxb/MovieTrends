@@ -506,7 +506,7 @@ function displayBubbleTooltipDetails(d) {
    				
 	tooltipSvg.transition()        
         .duration(200)      
-        .style("opacity", .7);
+        .style("opacity", .8);
         	
 }
 
@@ -544,7 +544,7 @@ function displayBarTooltipDetails(d) {
 		
 	tooltipSvg.transition()        
         .duration(200)      
-        .style("opacity", .7);      
+        .style("opacity", .8);      
 	
 }
 
@@ -580,7 +580,7 @@ function displayLineTooltipDetails(d, genreName) {
 	
 	tooltipSvg.transition()        
         .duration(200)      
-        .style("opacity", .7);      
+        .style("opacity", .8);      
 
 }
 
