@@ -1040,7 +1040,7 @@ function generateLineGraph(){
 			.attr("font-size", regTextSize);
 						
 	// draw lines representing total incomes for each genre group
-	var genreLines = lineSvg.selectAll(".genreLine")
+	var genreLines = lineSvg.selectAll(".genreGroup")
 						      	.data(function() { 
 						      			if(indexCurrYValue == 0) 
 						      				return genreGroupsIncomeInflation;
@@ -1048,7 +1048,7 @@ function generateLineGraph(){
 			      							return genreGroupsIncome; })
 						    	.enter()
 						    	.append("g")
-						      	.attr("class", "genreLine");
+						      	.attr("id", function(d) { return d.name + " Group"; });
 	
 					      	
 	genreLines.append("path")
@@ -1057,7 +1057,7 @@ function generateLineGraph(){
 	      .attr("d", function(d) { return line(d.values); })
 	      .on("mouseover", function(d) { 
 	      	if(lineSelected == null) {
-	      		highlightLine(this);
+	      		highlightLine(this.parentNode);
 	      	}
 	      })
 	      .on("mouseout", function(d) {
@@ -1067,7 +1067,7 @@ function generateLineGraph(){
 	      })
 	      .on("click", function(d) {
 	      	if(lineSelected == null) {
-	      		selectLine(this);
+	      		selectLine(this.parentNode,d.name);
 	      	}
 	      	else {
 	      		lineSelected = null;
@@ -1091,7 +1091,7 @@ function generateLineGraph(){
     		var thisLine = this;
 			d3.select(this)
 				.append("g")
-				.attr("class", "genrePoints")
+				.attr("id", genreName + " Points")
 				.selectAll("circle")
 				.data(function() { 
 						if(indexCurrYValue == 0) 
@@ -1125,7 +1125,7 @@ function generateLineGraph(){
 				})
 				.on("click", function(d) {
 					if(lineSelected == null){ 
-						selectLine(thisLine); 
+						selectLine(thisLine,genreName); 
 					}
 					else {
 						lineSelected = null;
@@ -1157,18 +1157,22 @@ function generateLineGraph(){
  * "Selects" the line that was clicked.
  * Highlights the line (even when mouse moves away)
  * and highlights all the points on that line.
+ * 
+ * @param o
+ * @param genreName
  */
-function selectLine(o) {	
+function selectLine(o, genreName) {	
 	lineSelected = o;
 	highlightLine(o);
-	d3.select(o).select(".genrePoints")
-			.each( function(d) { 
-					highlightPoint(this); 
-			});
+	d3.select("#" + genreName + " Points")
+		.moveToFront()
+		.each( function(d) { highlightPoint(this); });
 }
 
 /*
  * Highlights the line that's being hovered over.
+ * 
+ * @param o the path group object that is being hovered over
  */
 function highlightLine(o) {
 	d3.selectAll(".line")
@@ -1176,13 +1180,13 @@ function highlightLine(o) {
         .duration(100)
         .attr("opacity", 0.2);
 	
-	d3.select(o)
+	d3.select(o).select("path")
 		.transition()        
         .duration(100)
         .attr("opacity", 1.0)
 		.style("stroke-width",4);
 		
-	d3.select(o.parentNode).moveToFront();			
+	d3.select(o).moveToFront();			
 }
 
 /*
@@ -1200,6 +1204,8 @@ function unhighlightLines() {
 
 /*
  * Highlights the point that's being hovered over.
+ * 
+ * @param o the circle object that is being hovered over
  */
 function highlightPoint(o) {
 	d3.select(o)
