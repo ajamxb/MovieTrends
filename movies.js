@@ -1063,21 +1063,13 @@ function generateLineGraph(){
 				.attr("cy", function(d) { return lineYValueScale(d[genreName]); })
 				.attr("r", 5)
 				.on("mouseover", function(d) {
-					//removeDetails("g.legend");
-					//removeDetails("text.legend");
-					//year = d.year;
-					//currGenre = genreName;
-					//currIncome = incomeFormat(d[genreName]);
 					highlightPoint(this);
 					highlightLine(thisLine);
-					//displayPointDetails();
 					displayLineTooltipDetails(d,genreName);
 				})
 				.on("mouseout", function(d) {
-					//displayLegend(); 
 					unhighlightPoint(this);
 					unhighlightLine(thisLine);
-					//removeDetails("text.details");
 					removeTooltipDetails();
 				})
 				.on("click", function(d) { 
@@ -1110,14 +1102,17 @@ function generateLineGraph(){
  */
 function highlightLine(o) {
 	d3.selectAll(".line")
-	      		.attr("opacity", 0.2);
+		.transition()        
+        .duration(200)
+        .attr("opacity", 0.2);
 	      		
 	d3.select(this.parentNode).moveToFront();
 	
-	o.attr("opacity", 1.0)
+	o.transition()        
+        .duration(200)
+        .attr("opacity", 1.0)
 		.style("stroke-width",4);
 			
-	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -1126,11 +1121,14 @@ function highlightLine(o) {
  */
 function unhighlightLine(o) {
 	d3.selectAll(".line")
+		.transition()        
+        .duration(200)
 	    .attr("opacity", 1.0);
 	    
-	o.style("stroke-width",2);
+	o.transition()        
+        .duration(200)
+        .style("stroke-width",2);
 		
-	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -1138,9 +1136,10 @@ function unhighlightLine(o) {
  */
 function highlightPoint(o) {
 	d3.select(o)
+		.transition()        
+        .duration(200)
 		.attr("opacity", 1.0);
 
-	d3.selectAll(".point").moveToFront();
 }
 
 /*
@@ -1150,9 +1149,10 @@ function highlightPoint(o) {
  */
 function unhighlightPoint(o) {
 	d3.select(o)
+		.transition()        
+        .duration(200)
 		.attr("opacity", 0.0);
 
-	d3.selectAll(".point").moveToFront();
 }
 
 
