@@ -1164,7 +1164,7 @@ function generateLineGraph(){
 function selectLine(o, genreName) {	
 	lineSelected = o;
 	highlightLine(o);
-	d3.select("#" + genreName + " Points")
+	d3.select(o).selectAll(".point")
 		.moveToFront()
 		.each( function(d) { highlightPoint(this); });
 }
