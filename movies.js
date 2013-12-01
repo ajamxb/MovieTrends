@@ -83,8 +83,13 @@ var axisLabelWidth = 50;
 // Radius of a bubble
 var radius = 9;
 
+// Array containing the movies for the selected year
+var prevYearMovies;
+var currYearMovies;
+
 var bubbleXScale;
 var bubbleYScale;
+var bubbleYAxis;
 
 // Width of a bar 
 var barWidth = 25;
@@ -205,7 +210,7 @@ function loadData(filename){
             console.log(error);
         }
         else{
-            console.log(data);  //DEBUG: delete this later...     
+            //console.log(data);  //DEBUG: delete this later...     
             if (filename == files[0]) {
             	setupLayout();
             	moviesDataset = data;
@@ -601,6 +606,30 @@ function removeTooltipDetails() {
 }
 
 
+/**
+ * Sets up the bubble chart's y-scale according to the min and max incomes
+ * for the current year.
+ * 
+ * @author Annette Almonte
+ */
+function updateBubbleYScaleAndAxis() {
+	prevYearMovies = currYearMovies;
+	currYearMovies = moviesDataset.filter(function(d) {	
+									return d.production_year == String(currYear);
+								});
+	console.log(currYearMovies);
+								
+    bubbleYScale = d3.scale.linear()
+    						.domain([0, d3.max(currYearMovies, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
+    						.range([chartHeight - axisOffset, axisOffset]);
+    						
+	bubbleYAxis = d3.svg.axis()
+					.scale(bubbleYScale)
+					.orient("left")
+					.ticks(6)
+					.tickFormat(function(d) { return incomeFormat(d); });    
+}
+
 
 /*
  * Generates the bubble chart. 
@@ -614,16 +643,13 @@ function generateBubbleGraph(){
 				.attr("width", chartWidth)
 				.attr("height", chartHeight)
 				.attr("fill", "rgb(255, 255, 255)");
-				
+					
 	// Setup the scales
 	bubbleXScale = d3.time.scale()
 							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
         					.range([axisOffset, chartWidth - axisOffset]);
         			
-    bubbleYScale = d3.scale.linear()
-    						.domain([d3.min(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;}),
-    								d3.max(moviesDataset, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
-    						.range([chartHeight - axisOffset, axisOffset]);
+   updateBubbleYScaleAndAxis();
     						
 	var bubbleXAxis = d3.svg.axis()
 						.scale(bubbleXScale)
@@ -631,11 +657,7 @@ function generateBubbleGraph(){
 						.tickFormat(d3.time.format("%b"))
 						.tickSize(0);
 				
-	var bubbleYAxis = d3.svg.axis()
-						.scale(bubbleYScale)
-						.orient("left")
-						.ticks(6)
-						.tickFormat(function(d) { return incomeFormat(d); });
+
 					
 	bubbleSvg.append("g")
 				.attr("class", "axis")
@@ -664,11 +686,13 @@ function generateBubbleGraph(){
 	var bubbles = bubbleSvg.append("g")
 							.attr("class", "bubbleChartSvg")
 							.selectAll("circle")
-							.data(moviesDataset)
+							.data(currYearMovies)
 							.enter()
 							.append("g")
 							.attr("class", "bubble")
-							.append("circle");
+							.attr("visibility", "visible")
+							.append("circle")
+							.attr("class", "bubbleHalf");
 		
 	bubbles.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
@@ -680,12 +704,7 @@ function generateBubbleGraph(){
 			.attr("fill", function(d) {
 				return genreColors[parseInt(d.genre1_index)];
 			})
-			.attr("visibility", function(d) {
-				if (d.production_year == currYear) {
-					return "visible";
-				}
-				return "hidden";				
-			});
+			.attr("visibility", "visible");
 			
 	arc = d3.svg.arc()
 			.innerRadius(0)
@@ -695,6 +714,7 @@ function generateBubbleGraph(){
 	
 	bubbleSvg.selectAll(".bubble")
 			 .append("path")	
+			 .attr("class", "bubbleHalf")
 			 .attr("d", arc)
 			 .attr("fill", function(d) {
 			 	if (d.genre2_index != "") {
@@ -706,13 +726,8 @@ function generateBubbleGraph(){
 			      return "translate("+ bubbleXScale(new Date(currYear, d.month - 1, d.day)) + "," 
 				                     + bubbleYScale(d[yValues[indexCurrYValue]] / factor) + ")";
 			  })
-			  .attr("visibility", function(d) {
-			      if (d.production_year == currYear) {
-				      return "visible";
-				  }
-					  return "hidden";				
-			  });
-	            
+			  .attr("visibility", "visible");
+	
 	bubbleSvg.selectAll(".bubble")
 				.on("mouseover", function(d) { 
 					if (!movieDetailsOn) {
@@ -837,26 +852,18 @@ function drawBubbleGraphTitle() {
  * @author Annette Almonte
  */
 function updateBubbleGraph() {
-	drawBubbleGraphTitle();
-		
-	d3.selectAll(".bubble")
-		.selectAll("circle")
-		.attr("visibility", function(d) {
-			if (d.production_year == currYear) {
-				return "visible";
-			}
-			return "hidden";				
-		});
+	//var t0 = svg.transition().duration(500);
+	d3.select("#bubbleChart").remove();
+		bubbleSvg = svg.append("svg")
+						.attr("id", "bubbleChart")
+						.attr("x", "0")
+						.attr("y", (chartHeight + detailsHeight))
+						.attr("width", chartWidth)
+						.attr("height", chartHeight)
+						.attr("overflow","visible");
 	
-	d3.selectAll(".bubble")
-		.selectAll("path")
-		.attr("visibility", function(d) {
-			if (d.production_year == currYear) {
-				return "visible";
-			}
-			return "hidden";				
-		});
-	
+	generateBubbleGraph();
+			  
 	updateFilter("genreFilter", selectGenre);
 	updateFilter("ratingFilter", selectRating);
 	updateFilter("distributorFilter", selectDistributor);
@@ -1299,7 +1306,7 @@ function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, 
 	
 	var visibilityStatus;
 	
-	d3.selectAll(".bubble").each(function(d) {
+	d3.selectAll(".bubbleHalf").each(function(d) {
 		visibilityStatus = d3.select(this).attr("visibility");
 		
 		if (visibilityStatus == visibilityAttribute) {
