@@ -669,6 +669,7 @@ function generateBubbleGraph(){
 				.attr("y", axisLabelMargin - 12)
 				.text("Movie Release Date");
 	
+	
 	bubbleSvg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(" + axisOffset + ", 0)")
@@ -692,9 +693,13 @@ function generateBubbleGraph(){
 							.attr("class", "bubble")
 							.attr("visibility", "visible")
 							.append("circle")
+							.transition()
+							.duration(3000)
 							.attr("class", "bubbleHalf");
-		
-	bubbles.attr("cx", function(d) {
+	
+	bubbles.transition()
+			.duration(3000)
+			.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
 			.attr("cy", function(d) {
@@ -722,6 +727,8 @@ function generateBubbleGraph(){
 				}
 				return genreColors[parseInt(d.genre1_index)]
 			  })
+			  .transition()
+			 .duration(3000)
 			  .attr("transform", function(d) { 
 			      return "translate("+ bubbleXScale(new Date(currYear, d.month - 1, d.day)) + "," 
 				                     + bubbleYScale(d[yValues[indexCurrYValue]] / factor) + ")";
@@ -749,7 +756,7 @@ function generateBubbleGraph(){
 	            	// Remove the legend if it was previously displayed
 	            	if (!movieDetailsOn) {
 	            		removeDetails("g.legend");
-						removeDetails("text.legend");    			
+						removeDetails("text.legend"); 
 	           		}
 	           		
 	           		// Removes details for previously selected movie         	
@@ -766,6 +773,7 @@ function generateBubbleGraph(){
 		            updateMovieDetails(d);
 	            });
 	
+			 
 	
 	// If you click anywhere in the bubble chart after a circle is selected
 	// the DoD appearing for that circle in the DoD space will disappear		
@@ -782,19 +790,6 @@ function generateBubbleGraph(){
 	// draw graph title
 	drawBubbleGraphTitle();
 	
-}
-
-
-
-function updateMovieDetails(d) {
-	currDistributor = "Distributor: " + d.distributor;
-	currRating = "Rating: " + d.rating;
-	currGenre = "Genre: " + d.genre;
-	currTitle = d.title;
-	currBudget = "Production Budget: " + d.formatted_production_budget;
-	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
-	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
-	displayDetails();	
 }
 
 function clearMovieDetails() {
