@@ -791,6 +791,16 @@ function generateBubbleGraph(){
 	drawBubbleGraphTitle();
 	
 }
+function updateMovieDetails(d) {
+	currDistributor = "Distributor: " + d.distributor;
+	currRating = "Rating: " + d.rating;
+	currGenre = "Genre: " + d.genre;
+	currTitle = d.title;
+	currBudget = "Production Budget: " + d.formatted_production_budget;
+	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
+	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
+	displayDetails();	
+}
 
 function clearMovieDetails() {
 
