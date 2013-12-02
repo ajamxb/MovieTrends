@@ -4,9 +4,35 @@
     <meta charset="utf-8">
     <title>Movie Trends</title>
     <link rel="stylesheet" type="text/css" href="movies.css">
-    <script src="d3.v3.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="movies.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<!-- bin/jquery.slider.min.css -->
+	<link rel="stylesheet" href="css/jslider.css" type="text/css">
+	<link rel="stylesheet" href="css/jslider.blue.css" type="text/css">
+	<link rel="stylesheet" href="css/jslider.plastic.css" type="text/css">
+	<link rel="stylesheet" href="css/jslider.round.css" type="text/css">
+	<link rel="stylesheet" href="css/jslider.round.plastic.css" type="text/css">
+  <!-- end -->
+
+	<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
 	
+	<!-- bin/jquery.slider.min.js -->
+	<script type="text/javascript" src="js/jshashtable-2.1_src.js"></script>
+	<script type="text/javascript" src="js/jquery.numberformatter-1.2.3.js"></script>
+	<script type="text/javascript" src="js/tmpl.js"></script>
+	<script type="text/javascript" src="js/jquery.dependClass-0.1.js"></script>
+	<script type="text/javascript" src="js/draggable-0.1.js"></script>
+	<script type="text/javascript" src="js/jquery.slider.js"></script>
+  <!-- end -->
+	
+	<style type="text/css" media="screen">
+	  body { background: #FFFFFF; }
+	 .layout { padding: 50px; font-family: Georgia, serif; }
+	 .layout-slider { margin-bottom: 20px; width: 50%; }
+	 .layout-slider-settings { font-size: 12px; }
+	 .layout-slider-settings pre { font-family: Courier; }
+	</style>
+	
+	<script type="text/javascript" src="movies.js"></script>
 	
 </head>
 
@@ -16,6 +42,7 @@
     </div>
     <div id="filter" style="margin-right: 20px">
 		<ul>
+		<li style="font-weight:bold">Select All</li><input class="select" type="checkbox" id="Action" value="Action" name="selectAll" onClick="enableOtherCheckboxes();" checked>Enable/Disable Checkboxes
 		<li style="font-weight: bold">Genre</li>
 		<li><input class="filter" type="checkbox" id="Action"  value="Action"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
@@ -108,6 +135,19 @@
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Other</li>
 		</ul>
+		Income:
+	<div class="layout" style="height:50px">
+	
+    
+      <span style="display: inline-block; width: 200px;"><input id="Slider1" type="slider" name="price" value="1000000;600000000" /></span>
+   
+    <script type="text/javascript" charset="utf-8">
+      jQuery("#Slider1").slider({ from: 1000000, to: 6500000000, step: 10000, smooth: true, round: 0, dimension: "&nbsp;$", skin: "plastic" });
+    </script>
+
+
+    
+  </div>
     </div>
 </body>
 </html>
