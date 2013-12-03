@@ -693,8 +693,6 @@ function generateBubbleGraph(){
 							.attr("class", "bubble")
 							.attr("visibility", "visible")
 							.append("circle")
-							.transition()
-							.duration(3000)
 							.attr("class", "bubbleHalf");
 	
 	bubbles.transition()
@@ -727,8 +725,6 @@ function generateBubbleGraph(){
 				}
 				return genreColors[parseInt(d.genre1_index)]
 			  })
-			  .transition()
-			 .duration(3000)
 			  .attr("transform", function(d) { 
 			      return "translate("+ bubbleXScale(new Date(currYear, d.month - 1, d.day)) + "," 
 				                     + bubbleYScale(d[yValues[indexCurrYValue]] / factor) + ")";
