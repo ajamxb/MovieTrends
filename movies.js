@@ -1240,6 +1240,122 @@ function unhighlightPoints() {
 
 }
 
+function enableOtherCheckboxes(){
+	var select= document.getElementById("SelectAll");
+	var action = document.getElementById("Action");
+	var adventure= document.getElementById("Adventure");
+	var animation= document.getElementById("Animation");
+	var comedy= document.getElementById("Comedy");
+	var crime = document.getElementById("Crime");
+	var documentary= document.getElementById("Documentary");
+	var drama= document.getElementById("Drama");
+	var fantasy= document.getElementById("Fantasy");
+	var horror= document.getElementById("Horror");
+	var musical= document.getElementById("Musical");
+	var romance= document.getElementById("Romance");
+	var scifi= document.getElementById("Sci-Fi");
+	var thriller= document.getElementById("Thriller");
+	var war= document.getElementById("War");
+	var western= document.getElementById("Western");
+	var g= document.getElementById("G");
+	var pg= document.getElementById("PG");
+	var pg13= document.getElementById("PG-13");
+	var r= document.getElementById("R");
+	var bvista= document.getElementById("Buena Vista");
+	var dreamworks= document.getElementById("DreamWorks");
+	var fox= document.getElementById("Fox");
+	var paramount= document.getElementById("Paramount Pictures");
+	var sony= document.getElementById("Sony Pictures");
+	var universal= document.getElementById("Universal");
+	var warner= document.getElementById("Warner Bros.");
+	var other= document.getElementById("Other");
+	if(select.checked==false){
+		action.disabled = false;
+		adventure.disabled= false;
+		animation.disabled=false;
+		comedy.disabled=false;
+		crime.disabled=false;
+		documentary.disabled=false;
+		drama.disabled=false;
+		fantasy.disabled=false;
+		horror.disabled=false;
+		musical.disabled=false;
+		romance.disabled=false;
+		scifi.disabled=false;
+		thriller.disabled=false;
+		war.disabled=false;
+		western.disabled=false;
+		g.disabled=false;
+		pg.disabled=false;
+		pg13.disabled=false;
+		r.disabled=false;
+		bvista.disabled=false;
+		dreamworks.disabled=false;
+		fox.disabled=false;
+		paramount.disabled=false;
+		sony.disabled=false;
+		universal.disabled=false;
+		warner.disabled=false;
+		other.disabled=false;
+	}
+	if(select.checked==true){
+		action.disabled = true;
+		adventure.disabled= true;
+		animation.disabled=true;
+		comedy.disabled=true;
+		crime.disabled=true;
+		documentary.disabled=true;
+		drama.disabled=true;
+		fantasy.disabled=true;
+		horror.disabled=true;
+		musical.disabled=true;
+		romance.disabled=true;
+		scifi.disabled=true;
+		thriller.disabled=true;
+		war.disabled=true;
+		western.disabled=true;
+		g.disabled=true;
+		pg.disabled=true;
+		pg13.disabled=true;
+		r.disabled=true;
+		bvista.disabled=true;
+		dreamworks.disabled=true;
+		fox.disabled=true;
+		paramount.disabled=true;
+		sony.disabled=true;
+		universal.disabled=true;
+		warner.disabled=true;
+		other.disabled=true;
+		action.checked = true;
+		adventure.checked= true;
+		animation.checked=true;
+		comedy.checked=true;
+		crime.checked=true;
+		documentary.checked=true;
+		drama.checked=true;
+		fantasy.checked=true;
+		horror.checked=true;
+		musical.checked=true;
+		romance.checked=true;
+		scifi.checked=true;
+		thriller.checked=true;
+		war.checked=true;
+		western.checked=true;
+		g.checked=true;
+		pg.checked=true;
+		pg13.checked=true;
+		r.checked=true;
+		bvista.checked=true;
+		dreamworks.checked=true;
+		fox.checked=true;
+		paramount.checked=true;
+		sony.checked=true;
+		universal.checked=true;
+		warner.checked=true;
+		other.checked=true;
+	}
+}
+		
 
 /**
  * Filter for genres. This is the function that gets called when a 
