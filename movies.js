@@ -501,13 +501,11 @@ function displayBubbleTooltipDetails(d) {
 		.attr("y",tooltipTextMargin.top + 15)
 		.text(d.genre);
 	
-	/*
+	
 	tooltipSvg.attr("width", function() {
-    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
-    						+ 2 * tooltipTextMargin.side;
-    			});
-    */
-   	tooltipSvg.attr("width",tooltipWidth * 2);
+								var widths = [measureTextWidth(tooltipTitle.text()), measureTextWidth(tooltipGenre.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side) + 2;
+			    			});
    				
 	tooltipSvg.transition()        
         .duration(200)      
@@ -545,7 +543,10 @@ function displayBarTooltipDetails(d) {
 			}
 		});
 	
-	tooltipSvg.attr("width",100);
+	tooltipSvg.attr("width", function() {
+								var widths = [measureTextWidth(tooltipYear.text()), measureTextWidth(tooltipIncome.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side);
+			    			});
 		
 	tooltipSvg.transition()        
         .duration(200)      
@@ -575,14 +576,12 @@ function displayLineTooltipDetails(d, genreName) {
 		.attr("y",tooltipTextMargin.top + 15)
 		.text(d.year + " | " + incomeFormat(d[genreName]));
 	
-	/*
-	tooltipSvg.attr("width", function() {
-    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
-    						+ 2 * tooltipTextMargin.side;
-    			});	
-	*/
-	tooltipSvg.attr("width",tooltipWidth * 2)
 	
+	tooltipSvg.attr("width", function() {
+								var widths = [measureTextWidth(tooltipGenre.text()), measureTextWidth(tooltipYearIncome.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side);
+			    			});	
+
 	tooltipSvg.transition()        
         .duration(200)      
         .style("opacity", .8);      
@@ -896,7 +895,6 @@ function updateFilter(filterName, filteringFunction) {
 function generateLineGraph(){
 	
 	lineSvg.append("rect")
-				.attr("class", "whitespace")
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
@@ -1327,4 +1325,16 @@ function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, 
 		    	});
 		}
 	});
+}
+
+/*
+ * returns the width in pixels of the bounding box of a string of text
+ * assuming text style is same as for .tooltipText
+ * 
+ * credit: Andy Pruett
+ */
+function measureTextWidth(text) {
+	
+	$("#measureText").empty();
+	return $("#measureText").text(text).outerWidth();
 }
