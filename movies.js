@@ -501,13 +501,11 @@ function displayBubbleTooltipDetails(d) {
 		.attr("y",tooltipTextMargin.top + 15)
 		.text(d.genre);
 	
-	/*
+	
 	tooltipSvg.attr("width", function() {
-    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
-    						+ 2 * tooltipTextMargin.side;
-    			});
-    */
-   	tooltipSvg.attr("width",tooltipWidth * 2);
+								var widths = [measureTextWidth(tooltipTitle.text()), measureTextWidth(tooltipGenre.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side) + 2;
+			    			});
    				
 	tooltipSvg.transition()        
         .duration(200)      
@@ -545,7 +543,10 @@ function displayBarTooltipDetails(d) {
 			}
 		});
 	
-	tooltipSvg.attr("width",100);
+	tooltipSvg.attr("width", function() {
+								var widths = [measureTextWidth(tooltipYear.text()), measureTextWidth(tooltipIncome.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side);
+			    			});
 		
 	tooltipSvg.transition()        
         .duration(200)      
@@ -575,14 +576,12 @@ function displayLineTooltipDetails(d, genreName) {
 		.attr("y",tooltipTextMargin.top + 15)
 		.text(d.year + " | " + incomeFormat(d[genreName]));
 	
-	/*
-	tooltipSvg.attr("width", function() {
-    				return d3.max(tooltipTitle.textLength, tooltipGenre.textLength) 
-    						+ 2 * tooltipTextMargin.side;
-    			});	
-	*/
-	tooltipSvg.attr("width",tooltipWidth * 2)
 	
+	tooltipSvg.attr("width", function() {
+								var widths = [measureTextWidth(tooltipGenre.text()), measureTextWidth(tooltipYearIncome.text())];
+			    				return d3.max(widths) + (2 * tooltipTextMargin.side);
+			    			});	
+
 	tooltipSvg.transition()        
         .duration(200)      
         .style("opacity", .8);      
@@ -669,7 +668,6 @@ function generateBubbleGraph(){
 				.attr("y", axisLabelMargin - 12)
 				.text("Movie Release Date");
 	
-	
 	bubbleSvg.append("g")
 				.attr("class", "axis")
 				.attr("transform", "translate(" + axisOffset + ", 0)")
@@ -694,10 +692,8 @@ function generateBubbleGraph(){
 							.attr("visibility", "visible")
 							.append("circle")
 							.attr("class", "bubbleHalf");
-	
-	bubbles.transition()
-			.duration(3000)
-			.attr("cx", function(d) {
+		
+	bubbles.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
 			.attr("cy", function(d) {
@@ -752,7 +748,7 @@ function generateBubbleGraph(){
 	            	// Remove the legend if it was previously displayed
 	            	if (!movieDetailsOn) {
 	            		removeDetails("g.legend");
-						removeDetails("text.legend"); 
+						removeDetails("text.legend");    			
 	           		}
 	           		
 	           		// Removes details for previously selected movie         	
@@ -769,7 +765,6 @@ function generateBubbleGraph(){
 		            updateMovieDetails(d);
 	            });
 	
-			 
 	
 	// If you click anywhere in the bubble chart after a circle is selected
 	// the DoD appearing for that circle in the DoD space will disappear		
@@ -787,6 +782,9 @@ function generateBubbleGraph(){
 	drawBubbleGraphTitle();
 	
 }
+
+
+
 function updateMovieDetails(d) {
 	currDistributor = "Distributor: " + d.distributor;
 	currRating = "Rating: " + d.rating;
@@ -897,7 +895,6 @@ function updateFilter(filterName, filteringFunction) {
 function generateLineGraph(){
 	
 	lineSvg.append("rect")
-				.attr("class", "whitespace")
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
@@ -1236,122 +1233,6 @@ function unhighlightPoints() {
 
 }
 
-function enableOtherCheckboxes(){
-	var select= document.getElementById("SelectAll");
-	var action = document.getElementById("Action");
-	var adventure= document.getElementById("Adventure");
-	var animation= document.getElementById("Animation");
-	var comedy= document.getElementById("Comedy");
-	var crime = document.getElementById("Crime");
-	var documentary= document.getElementById("Documentary");
-	var drama= document.getElementById("Drama");
-	var fantasy= document.getElementById("Fantasy");
-	var horror= document.getElementById("Horror");
-	var musical= document.getElementById("Musical");
-	var romance= document.getElementById("Romance");
-	var scifi= document.getElementById("Sci-Fi");
-	var thriller= document.getElementById("Thriller");
-	var war= document.getElementById("War");
-	var western= document.getElementById("Western");
-	var g= document.getElementById("G");
-	var pg= document.getElementById("PG");
-	var pg13= document.getElementById("PG-13");
-	var r= document.getElementById("R");
-	var bvista= document.getElementById("Buena Vista");
-	var dreamworks= document.getElementById("DreamWorks");
-	var fox= document.getElementById("Fox");
-	var paramount= document.getElementById("Paramount Pictures");
-	var sony= document.getElementById("Sony Pictures");
-	var universal= document.getElementById("Universal");
-	var warner= document.getElementById("Warner Bros.");
-	var other= document.getElementById("Other");
-	if(select.checked==false){
-		action.disabled = false;
-		adventure.disabled= false;
-		animation.disabled=false;
-		comedy.disabled=false;
-		crime.disabled=false;
-		documentary.disabled=false;
-		drama.disabled=false;
-		fantasy.disabled=false;
-		horror.disabled=false;
-		musical.disabled=false;
-		romance.disabled=false;
-		scifi.disabled=false;
-		thriller.disabled=false;
-		war.disabled=false;
-		western.disabled=false;
-		g.disabled=false;
-		pg.disabled=false;
-		pg13.disabled=false;
-		r.disabled=false;
-		bvista.disabled=false;
-		dreamworks.disabled=false;
-		fox.disabled=false;
-		paramount.disabled=false;
-		sony.disabled=false;
-		universal.disabled=false;
-		warner.disabled=false;
-		other.disabled=false;
-	}
-	if(select.checked==true){
-		action.disabled = true;
-		adventure.disabled= true;
-		animation.disabled=true;
-		comedy.disabled=true;
-		crime.disabled=true;
-		documentary.disabled=true;
-		drama.disabled=true;
-		fantasy.disabled=true;
-		horror.disabled=true;
-		musical.disabled=true;
-		romance.disabled=true;
-		scifi.disabled=true;
-		thriller.disabled=true;
-		war.disabled=true;
-		western.disabled=true;
-		g.disabled=true;
-		pg.disabled=true;
-		pg13.disabled=true;
-		r.disabled=true;
-		bvista.disabled=true;
-		dreamworks.disabled=true;
-		fox.disabled=true;
-		paramount.disabled=true;
-		sony.disabled=true;
-		universal.disabled=true;
-		warner.disabled=true;
-		other.disabled=true;
-		action.checked = true;
-		adventure.checked= true;
-		animation.checked=true;
-		comedy.checked=true;
-		crime.checked=true;
-		documentary.checked=true;
-		drama.checked=true;
-		fantasy.checked=true;
-		horror.checked=true;
-		musical.checked=true;
-		romance.checked=true;
-		scifi.checked=true;
-		thriller.checked=true;
-		war.checked=true;
-		western.checked=true;
-		g.checked=true;
-		pg.checked=true;
-		pg13.checked=true;
-		r.checked=true;
-		bvista.checked=true;
-		dreamworks.checked=true;
-		fox.checked=true;
-		paramount.checked=true;
-		sony.checked=true;
-		universal.checked=true;
-		warner.checked=true;
-		other.checked=true;
-	}
-}
-		
 
 /**
  * Filter for genres. This is the function that gets called when a 
@@ -1444,4 +1325,16 @@ function updateBubbleVisibility(visibilityAttribute, checkboxInput, filterType, 
 		    	});
 		}
 	});
+}
+
+/*
+ * returns the width in pixels of the bounding box of a string of text
+ * assuming text style is same as for .tooltipText
+ * 
+ * credit: Andy Pruett
+ */
+function measureTextWidth(text) {
+	
+	$("#measureText").empty();
+	return $("#measureText").text(text).outerWidth();
 }
