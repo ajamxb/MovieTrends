@@ -429,11 +429,11 @@ function displayDetails() {
         
         // Represents the left, middle, and rightmost columns in the DOD space
         var xPos = [xOffset, 180, 410, 640,870];
-		var tPos=[410,640,870];
+		var tPos=[420,650,880];
 		
         
         // Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
-        var yPos = [50, 80, 95];
+        var yPos = [50, 80, 97];
         
         var xAlign = ["start", "middle", "end"];
         
@@ -445,7 +445,7 @@ function displayDetails() {
         }
                         
         addText("middleColumn details title", detailsWidth/2, yPos[0], xAlign[1], currTitle);
-		addText("middleColumn details distributor", detailsWidth/2, 70,xAlign[1],currDistributor+"|"+currYear);
+		addText("middleColumn details distributor", detailsWidth/2, 65,xAlign[1],currDistributor+"|"+currYear);
      
           for (var i = 0; i < yPos.length; i++) {
                addText("rightColumn details", tPos[i], 115, xAlign[0], rightColText[i]);        
