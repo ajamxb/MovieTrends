@@ -34,7 +34,15 @@ filter {
 #details text {
 	font-family: Calibri, Arial;
 }
+.middleColumn.details.title{
+	font-size: 40px;
+	font-weight: bold;
+}
 
+.leftColumn.details{
+	font-size: 25px;
+	font-weight: bold;
+}
 .legend {
 	font-size: 12px;
 }
