@@ -27,7 +27,8 @@ filter {
 }
 
 .axis text {
-    font-family: sans-serif;
+    font-family: Arial;
+    font-size: 12px;
 }
 
 #details text {
