@@ -88,6 +88,7 @@ var prevYearMovies;
 var currYearMovies;
 
 var bubbleXScale;
+var bubbleXAxis;
 var bubbleYScale;
 var bubbleYAxis;
 
@@ -611,22 +612,37 @@ function removeTooltipDetails() {
  * 
  * @author Annette Almonte
  */
-function updateBubbleYScaleAndAxis() {
+function updateBubbleScalesAndAxes() {
 	prevYearMovies = currYearMovies;
 	currYearMovies = moviesDataset.filter(function(d) {	
 									return d.production_year == String(currYear);
 								});
+								
+
 	console.log(currYearMovies);
+
+	bubbleXScale = d3.time.scale()
+							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
+        					.range([axisOffset, chartWidth - axisOffset]);	
+	
 								
     bubbleYScale = d3.scale.linear()
     						.domain([0, d3.max(currYearMovies, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
     						.range([chartHeight - axisOffset, axisOffset]);
-    						
+
+	bubbleXAxis = d3.svg.axis()
+					.scale(bubbleXScale)
+					.orient("bottom")
+					.tickFormat(d3.time.format("%b"))
+					.tickSize(0); 
+
 	bubbleYAxis = d3.svg.axis()
 					.scale(bubbleYScale)
 					.orient("left")
 					.ticks(6)
-					.tickFormat(function(d) { return incomeFormat(d); });    
+					.tickFormat(function(d) { 
+						return incomeFormat(d); 
+					});       		
 }
 
 
@@ -643,23 +659,11 @@ function generateBubbleGraph(){
 				.attr("height", chartHeight)
 				.attr("fill", "rgb(255, 255, 255)");
 					
-	// Setup the scales
-	bubbleXScale = d3.time.scale()
-							.domain([new Date(currYear - 1, startMonth, startDay), new Date(currYear, endMonth, endDay)])
-        					.range([axisOffset, chartWidth - axisOffset]);
-        			
-   updateBubbleYScaleAndAxis();
-    						
-	var bubbleXAxis = d3.svg.axis()
-						.scale(bubbleXScale)
-						.orient("bottom")
-						.tickFormat(d3.time.format("%b"))
-						.tickSize(0);
-				
-
+    			
+    updateBubbleScalesAndAxes();
 					
 	bubbleSvg.append("g")
-				.attr("class", "axis")
+				.attr("class", "x axis")
 				.attr("transform", "translate(0," + (chartHeight - axisOffset) + ")")
 				.call(bubbleXAxis)
 				.append("text")
@@ -669,7 +673,7 @@ function generateBubbleGraph(){
 				.text("Movie Release Date");
 	
 	bubbleSvg.append("g")
-				.attr("class", "axis")
+				.attr("class", "y axis")
 				.attr("transform", "translate(" + axisOffset + ", 0)")
 				.call(bubbleYAxis)
 				.append("text")
@@ -681,10 +685,32 @@ function generateBubbleGraph(){
     
     bubbleSvg.selectAll("text")
     			.attr("font-size", regTextSize);    					 
-			
+		
+	graphBubbles();
+	
+	// If you click anywhere in the bubble chart after a circle is selected
+	// the DoD appearing for that circle in the DoD space will disappear		
+	d3.select(".whitespace")
+		.on("click", function(d) {
+			if (movieDetailsOn) {
+				movieDetailsOn = false;          
+				d3.selectAll(".bubble")
+				    .attr("opacity", 1.0);
+				clearMovieDetails();
+			}
+		});	
+}
+
+/**
+ * Graphs the bubbles on the bubble chart and adds interactions.
+ * 
+ * @author Annette Almonte
+ */
+function graphBubbles() {
+
 	var bubbles = bubbleSvg.append("g")
 							.attr("class", "bubbleChartSvg")
-							.selectAll("circle")
+							.selectAll(".bubble")
 							.data(currYearMovies)
 							.enter()
 							.append("g")
@@ -692,25 +718,25 @@ function generateBubbleGraph(){
 							.attr("visibility", "visible")
 							.append("circle")
 							.attr("class", "bubbleHalf");
-		
+								
 	bubbles.attr("cx", function(d) {
 				return bubbleXScale(new Date(currYear, d.month - 1, d.day));  
 			})
 			.attr("cy", function(d) {
-				return bubbleYScale(d[yValues[indexCurrYValue]] / factor); 
+				return bubbleYScale(0); 
 			})
-			.attr("r", radius)
+			.attr("r", radius/2)
 			.attr("fill", function(d) {
 				return genreColors[parseInt(d.genre1_index)];
 			})
 			.attr("visibility", "visible");
-			
+
 	arc = d3.svg.arc()
 			.innerRadius(0)
-			.outerRadius(radius)
+			.outerRadius(radius / 2)
 			.startAngle(0)
 			.endAngle(Math.PI);
-	
+			
 	bubbleSvg.selectAll(".bubble")
 			 .append("path")	
 			 .attr("class", "bubbleHalf")
@@ -723,9 +749,20 @@ function generateBubbleGraph(){
 			  })
 			  .attr("transform", function(d) { 
 			      return "translate("+ bubbleXScale(new Date(currYear, d.month - 1, d.day)) + "," 
-				                     + bubbleYScale(d[yValues[indexCurrYValue]] / factor) + ")";
+				                     + bubbleYScale(0) + ")";
 			  })
 			  .attr("visibility", "visible");
+			  
+	d3.select(".bubbleChartSvg")
+		.selectAll("g")
+		.transition()
+		.duration(1000)
+		.attr("transform", function(d) {
+			return "translate("+ (-bubbleXScale(new Date(currYear, d.month - 1, d.day))) + "," 
+				                     + (-bubbleYScale(0)) + ") scale(2) translate(" + (0) + "," 
+				                     + ((bubbleYScale(d[yValues[indexCurrYValue]] / factor) - (chartHeight - axisOffset)) / 2) + ")";
+			//return "translate(0," + (bubbleYScale(d[yValues[indexCurrYValue]] / factor) - (chartHeight - axisOffset)) + ")";			
+		});
 	
 	bubbleSvg.selectAll(".bubble")
 				.on("mouseover", function(d) { 
@@ -763,27 +800,11 @@ function generateBubbleGraph(){
 		            d3.select(this).moveToFront()
 		                .attr("opacity", 1.0);
 		            updateMovieDetails(d);
-	            });
-	
-	
-	// If you click anywhere in the bubble chart after a circle is selected
-	// the DoD appearing for that circle in the DoD space will disappear		
-	d3.select(".whitespace")
-		.on("click", function(d) {
-			if (movieDetailsOn) {
-				movieDetailsOn = false;          
-				d3.selectAll(".bubble")
-				    .attr("opacity", 1.0);
-				clearMovieDetails();
-			}
-		});
-					
+	            });	
+	            
 	// draw graph title
 	drawBubbleGraphTitle();
-	
 }
-
-
 
 function updateMovieDetails(d) {
 	currDistributor = "Distributor: " + d.distributor;
@@ -835,6 +856,7 @@ function determineCurrentBarYLabel() {
 
 
 function drawBubbleGraphTitle() {
+	console.log("yo");
 	bubbleSvg.selectAll(".graphTitle").remove();
 	bubbleSvg.append("text")
 		.attr("class", "graphTitle")
@@ -851,8 +873,8 @@ function drawBubbleGraphTitle() {
  * @author Annette Almonte
  */
 function updateBubbleGraph() {
-	//var t0 = svg.transition().duration(500);
-	d3.select("#bubbleChart").remove();
+
+	/*d3.select("#bubbleChart").remove();
 		bubbleSvg = svg.append("svg")
 						.attr("id", "bubbleChart")
 						.attr("x", "0")
@@ -861,7 +883,19 @@ function updateBubbleGraph() {
 						.attr("height", chartHeight)
 						.attr("overflow","visible");
 	
-	generateBubbleGraph();
+	generateBubbleGraph();*/
+	
+	var t0 = bubbleSvg.transition().duration(500);
+	
+	updateBubbleScalesAndAxes();
+	
+	d3.select(".bubbleChartSvg")
+		.remove();
+		
+	graphBubbles();
+		
+	d3.select(".x.axis").call(bubbleXAxis);
+	t0.selectAll(".y.axis").call(bubbleYAxis);
 			  
 	updateFilter("genreFilter", selectGenre);
 	updateFilter("ratingFilter", selectRating);
