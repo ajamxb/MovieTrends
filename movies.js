@@ -856,7 +856,6 @@ function determineCurrentBarYLabel() {
 
 
 function drawBubbleGraphTitle() {
-	console.log("yo");
 	bubbleSvg.selectAll(".graphTitle").remove();
 	bubbleSvg.append("text")
 		.attr("class", "graphTitle")
@@ -1303,8 +1302,29 @@ function selectDistributor(value) {
 }
 
 
+function selectAll(value) {
+	var isChecked = document.getElementById(value).checked;
+	var checkboxes = document.getElementsByClassName("filter");
+	for (var i = 0; i < checkboxes.length; i++) {
+		if (isChecked) {
+			checkboxes[i].checked = true;
+			d3.selectAll(".bubbleHalf").each(function(d) {
+					d3.select(this).attr("visibility", "visible");
+				});
+		}
+		else {
+			checkboxes[i].checked = false;
+			d3.selectAll(".bubbleHalf").each(function(d) {
+					d3.select(this).attr("visibility", "hidden");
+				});		
+		}
+	}
+
+	
+}
+
 /**
- * Filter for the elements that get checked/uncked in the checkboxes.
+ * Filter for the elements that get checked/unchecked in the checkboxes.
  * 
  * @param {Object} value the input obtained from the checkbox when it's clicked
  * @param {Object} filterName the name of the column in the dataset D3 will 
