@@ -15,7 +15,9 @@ var svgWidth = 1000;
 var svgHeight = 800;
 var totalChartHeight = 300;
 var chartWidth = 1000;
-var chartHeight = 300;
+var dodChartHeight = 300;
+var lineChartHeight = 300; //250
+var bubbleChartHeight = 300; //350
 var detailsWidth = 1000;
 var detailsHeight = 150; //200;
 var filtersWidth = 200;
@@ -134,6 +136,9 @@ var lineSelected = null;
 
 // formats dollar amount with dollar sign and commas							        
 var incomeFormat = d3.format("$,f");
+
+// Keeps track of whether the bubble/line chart is expanded in height.
+var isGraphExpanded = false;
 	
 /*
  * We have referenced this code from https://gist.github.com/trtg/3922684
@@ -163,22 +168,22 @@ function setupLayout() {
 						.attr("x", "0")
 						.attr("y", 0)
 						.attr("width", chartWidth)
-						.attr("height", chartHeight)
+						.attr("height", lineChartHeight)
 						.attr("overflow","visible");
 						
 	detailsSvg = svg.append("svg")
 						.attr("id", "details")
 						.attr("x", "0")
-						.attr("y", chartHeight)
+						.attr("y", dodChartHeight)
 						.attr("width", detailsWidth)
 						.attr("height", detailsHeight)
 
 	bubbleSvg = svg.append("svg")
 						.attr("id", "bubbleChart")
 						.attr("x", "0")
-						.attr("y", (chartHeight + detailsHeight))
+						.attr("y", (bubbleChartHeight + detailsHeight))
 						.attr("width", chartWidth)
-						.attr("height", chartHeight)
+						.attr("height", bubbleChartHeight)
 						.attr("overflow","visible");
 	
 	// create "tooltip" div and svg that will pop up next to mouse to display details-on-demand
@@ -285,8 +290,9 @@ function generateDetails() {
 	displayLegend();
 }
 
-/*
+/**
  * Displays the key for both the bubble and line charts.
+ * 
  * @author Annette Almonte 
  */
 function displayLegend() {
@@ -295,9 +301,10 @@ function displayLegend() {
 	displayLineChartKey();
 }
 
-/*
+/**
  * Creates the color swatches and corresponding text for 
  * the bubble chart key.
+ * 
  * @author Annette Almonte
  */
 function displayBubbleChartKey() {
@@ -333,8 +340,10 @@ function displayBubbleChartKey() {
 	}	
 }
 
-/*
+/**
  * Creates a color swatch for the bubble chart key.
+ * 
+ * @author Annette Almonte
  */
 function displayColorSwatch(index, cx, cy, radius, fill) {
 	
@@ -346,9 +355,10 @@ function displayColorSwatch(index, cx, cy, radius, fill) {
 	
 }
 
-/*
+/**
  * Creates the color swatches and corresponding text for 
  * the line chart key.
+ * 
  * @author Annette Almonte
  */
 function displayLineChartKey() {
@@ -388,8 +398,9 @@ function displayLineChartKey() {
 }
 
 
-/*
+/**
  * Creates a line swatch for the line graph key.
+ * 
  * @author Annette Almonte
  */
 function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
@@ -403,9 +414,10 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
 				.attr("stroke-width", 5);
 }
 
-/*
+/**
  * Displays the data pertaining to a movie when a user
  * hovers over a bubble.
+ * 
  * @author Annette Almonte 
  */
 function displayDetails() {
@@ -483,7 +495,7 @@ function removeDetails(className) {
 /*
  * display pop-up details next to mouse
  * when hovering over a bubble
- * @author allichis
+ * @author Allison Chislett
  */
 function displayBubbleTooltipDetails(d) {
 	
@@ -515,10 +527,10 @@ function displayBubbleTooltipDetails(d) {
 }
 
 
-/*
+/**
  * display pop-up details next to mouse
  * when hovering over a bar
- * @author allichis
+ * @author Allison Chislett
  */
 function displayBarTooltipDetails(d) {
 	
@@ -555,10 +567,10 @@ function displayBarTooltipDetails(d) {
 	
 }
 
-/*
+/**
  * display pop-up details next to mouse
  * when hovering over a data point on a genre line
- * @author allichis
+ * @author Allison Chislett
  */
 function displayLineTooltipDetails(d, genreName) {
 	
@@ -590,9 +602,9 @@ function displayLineTooltipDetails(d, genreName) {
 }
 
 
-/*
+/**
  * remove pop-up details
- * @author allichis
+ * @author Allison Chislett
  */
 function removeTooltipDetails() {
 	
@@ -628,7 +640,7 @@ function updateBubbleScalesAndAxes() {
 								
     bubbleYScale = d3.scale.linear()
     						.domain([0, d3.max(currYearMovies, function(d) { return d[yValues[indexCurrYValue]] / factor;})])
-    						.range([chartHeight - axisOffset, axisOffset]);
+    						.range([bubbleChartHeight - axisOffset, axisOffset]);
 
 	bubbleXAxis = d3.svg.axis()
 					.scale(bubbleXScale)
@@ -656,15 +668,15 @@ function generateBubbleGraph(){
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
-				.attr("height", chartHeight)
+				.attr("height", bubbleChartHeight)
 				.attr("fill", "rgb(255, 255, 255)");
 					
     			
     updateBubbleScalesAndAxes();
-					
+	
 	bubbleSvg.append("g")
 				.attr("class", "x axis")
-				.attr("transform", "translate(0," + (chartHeight - axisOffset) + ")")
+				.attr("transform", "translate(0," + (bubbleChartHeight - axisOffset) + ")")
 				.call(bubbleXAxis)
 				.append("text")
 				.attr("text-anchor","middle")
@@ -677,16 +689,24 @@ function generateBubbleGraph(){
 				.attr("transform", "translate(" + axisOffset + ", 0)")
 				.call(bubbleYAxis)
 				.append("text")
+				.attr("id", "yLabel")
 				.attr("text-anchor","middle")
 				.attr("transform","rotate(-90)")
-				.attr("x", -(chartHeight) / 2)
+				.attr("x", -(bubbleChartHeight) / 2)
         		.attr("y", -axisLabelMargin)
         		.text(determineCurrentLabel());	 
     
     bubbleSvg.selectAll("text")
-    			.attr("font-size", regTextSize);    					 
+    			.attr("font-size", regTextSize);		   					 
 		
 	graphBubbles();
+	
+	bubbleSvg.select(".x.axis")
+				.append("text")
+				.attr("text-anchor","middle")
+				.attr("x", chartWidth / 2)
+				.attr("y", axisLabelMargin - 12)
+				.text("Movie Release Date");
 	
 	// If you click anywhere in the bubble chart after a circle is selected
 	// the DoD appearing for that circle in the DoD space will disappear		
@@ -698,6 +718,12 @@ function generateBubbleGraph(){
 				    .attr("opacity", 1.0);
 				clearMovieDetails();
 			}
+			if (!isGraphExpanded) {
+				isGraphExpanded = true;
+				bubbleChartHeight = 350;
+				updateBubbleGraph();
+			}
+
 		});	
 }
 
@@ -760,8 +786,7 @@ function graphBubbles() {
 		.attr("transform", function(d) {
 			return "translate("+ (-bubbleXScale(new Date(currYear, d.month - 1, d.day))) + "," 
 				                     + (-bubbleYScale(0)) + ") scale(2) translate(" + (0) + "," 
-				                     + ((bubbleYScale(d[yValues[indexCurrYValue]] / factor) - (chartHeight - axisOffset)) / 2) + ")";
-			//return "translate(0," + (bubbleYScale(d[yValues[indexCurrYValue]] / factor) - (chartHeight - axisOffset)) + ")";			
+				                     + ((bubbleYScale(d[yValues[indexCurrYValue]] / factor) - (bubbleChartHeight - axisOffset)) / 2) + ")";			
 		});
 	
 	bubbleSvg.selectAll(".bubble")
@@ -802,10 +827,35 @@ function graphBubbles() {
 		            updateMovieDetails(d);
 	            });	
 	            
-	// draw graph title
+	// Draw graph title
 	drawBubbleGraphTitle();
+	
+	bubbleSvg.selectAll(".axis").selectAll(".text").remove();
+	
+	bubbleSvg.select(".x.axis")
+				.attr("transform", "translate(0," + (bubbleChartHeight - axisOffset) + ")")
+				.call(bubbleXAxis);
+	
+
+	
+	bubbleSvg.select("#yLabel")
+				.transition()
+				.duration(500)
+				.attr("transform","rotate(-90)")
+				.attr("text-anchor","middle")
+				.attr("x", -(bubbleChartHeight) / 2)
+        		.attr("y", -axisLabelMargin)
+        		.text(determineCurrentLabel());	 
+    
+    bubbleSvg.selectAll("text")
+    			.attr("font-size", regTextSize); 	
 }
 
+/**
+ * Updates the DoD for the movie data in the DoD space.
+ * 
+ * @author Annette Almonte and Allison Chislett
+ */
 function updateMovieDetails(d) {
 	currDistributor = "Distributor: " + d.distributor;
 	currRating = "Rating: " + d.rating;
@@ -817,8 +867,12 @@ function updateMovieDetails(d) {
 	displayDetails();	
 }
 
+/**
+ * Clears the DoD for the movie data in the DoD space.
+ * 
+ * @author Annette Almonte
+ */
 function clearMovieDetails() {
-
 	currDistributor = "";
 	currRating = "";
 	currGenre = "";
@@ -830,7 +884,7 @@ function clearMovieDetails() {
 	displayLegend();
 }
 
-/*
+/**
  * Determines the label for the y-axes based on what mode (adjusted income or
  * actual domestic income) the user is in.
  * 
@@ -854,7 +908,11 @@ function determineCurrentBarYLabel() {
 	return "Income (billions USD)";
 }
 
-
+/**
+ * Draws the title of the bubble graph with the current year.
+ * 
+ * @author Allison Chislett
+ */
 function drawBubbleGraphTitle() {
 	bubbleSvg.selectAll(".graphTitle").remove();
 	bubbleSvg.append("text")
@@ -869,20 +927,12 @@ function drawBubbleGraphTitle() {
  * Updates bubble graph to display current selected year with the filtered
  * components.
  * 
+ * NOTE: var t0 = bubbleSvg.transition().duration(500); was a snippet of code
+ * I got from HW6; it was made by my then partner, Edward Purcell
+ * 
  * @author Annette Almonte
  */
 function updateBubbleGraph() {
-
-	/*d3.select("#bubbleChart").remove();
-		bubbleSvg = svg.append("svg")
-						.attr("id", "bubbleChart")
-						.attr("x", "0")
-						.attr("y", (chartHeight + detailsHeight))
-						.attr("width", chartWidth)
-						.attr("height", chartHeight)
-						.attr("overflow","visible");
-	
-	generateBubbleGraph();*/
 	
 	var t0 = bubbleSvg.transition().duration(500);
 	
@@ -893,33 +943,14 @@ function updateBubbleGraph() {
 		
 	graphBubbles();
 		
-	d3.select(".x.axis").call(bubbleXAxis);
-	t0.selectAll(".y.axis").call(bubbleYAxis);
+	t0.select(".x.axis").call(bubbleXAxis);
+	t0.select(".y.axis").call(bubbleYAxis);
 			  
 	updateFilter("genreFilter", selectGenre);
 	updateFilter("ratingFilter", selectRating);
 	updateFilter("distributorFilter", selectDistributor);
 		
 }
-
-/**
- * Iterates through all the categories that have been unchecked and updates
- * the filtered selection.
- * 
- * @param {Object} filterName the name of the filter based on its HTML "name" attribute
- * @param {Object} filteringFunction filter function that will be used depending on the 
- *                 kind of data that's being filtered (genre, rating, or distributor)
- * @author Annette Almonte 
- */
-function updateFilter(filterName, filteringFunction) {
-	var categories = document.getElementsByName(filterName);
-	for (var i = 0; i < categories.length; i++) {
-		if (document.getElementById(categories[i].value).checked == false) {
-			filteringFunction(categories[i].value);
-		}
-	}
-}
- 
 
 /*
  * generates the line graph to display genre data
@@ -931,7 +962,7 @@ function generateLineGraph(){
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
-				.attr("height", chartHeight)
+				.attr("height", lineChartHeight)
 				.attr("fill", "rgb(255, 255, 255)")
 				.on("click", function(d) {
 					if (lineSelected != null) {
@@ -952,11 +983,11 @@ function generateLineGraph(){
 
     var lineYScale = d3.scale.linear()
     						.domain([maxIncome,0])
-    						.range([axisOffset, chartHeight - axisOffset]);
+    						.range([axisOffset, lineChartHeight - axisOffset]);
     						
     var lineYValueScale = d3.scale.linear()
     						.domain([maxIncome,0])
-    						.range([axisOffset, chartHeight - axisOffset - 2]);
+    						.range([axisOffset, lineChartHeight - axisOffset - 2]);
     
     						
 	var line = d3.svg.line()
@@ -984,7 +1015,7 @@ function generateLineGraph(){
 						})
 						.attr("width", barWidth)
 						.attr("height", function(d) {
-							return chartHeight - axisOffset - lineYValueScale(d[yValues[indexCurrYValue]]);
+							return lineChartHeight - axisOffset - lineYValueScale(d[yValues[indexCurrYValue]]);
 						})
 						.attr("fill", function(d) {
 							if(d.year == currYear) return barSelectedColor;
@@ -1049,7 +1080,7 @@ function generateLineGraph(){
 	// draw axes
 	lineSvg.append("g")
 				.attr("class", "axis")
-				.attr("transform", "translate(0," + (chartHeight-axisOffset) + ")")
+				.attr("transform", "translate(0," + (lineChartHeight-axisOffset) + ")")
 				.call(lineXAxis)
 				.selectAll("text")
 			    .attr("x", 0)
@@ -1069,7 +1100,7 @@ function generateLineGraph(){
 				.append("text")
 					.attr("transform","rotate(-90)")
 					.attr("text-anchor","middle")
-					.attr("x", -(chartHeight) / 2)
+					.attr("x", -(lineChartHeight) / 2)
 			        .attr("y", -axisLabelMargin)
 			        .text(determineCurrentBarYLabel());
 			        
@@ -1273,6 +1304,7 @@ function unhighlightPoints() {
  * function is hooked to the HTML.
  * 
  * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @author Annette Almonte 
  */
 function selectGenre(value) {
 	filter(value, "genre1");
@@ -1285,6 +1317,7 @@ function selectGenre(value) {
  * function is hooked to the HTML.
  * 
  * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @author Annette Almonte 
  */
 function selectRating(value) {
 	filter(value, "rating");
@@ -1296,12 +1329,18 @@ function selectRating(value) {
  * function is hooked to the HTML.
  * 
  * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @author Annette Almonte 
  */
 function selectDistributor(value) {
 	filter(value, "distributor_filter");
 }
 
-
+/**
+ * Checks/unchecks all of the filters.
+ * 
+ * @param {Object} value the input obtained from the checkbox when it's clicked
+ * @author Annette Almonte 
+ */
 function selectAll(value) {
 	var isChecked = document.getElementById(value).checked;
 	var checkboxes = document.getElementsByClassName("filter");
@@ -1318,9 +1357,7 @@ function selectAll(value) {
 					d3.select(this).attr("visibility", "hidden");
 				});		
 		}
-	}
-
-	
+	}	
 }
 
 /**
@@ -1341,6 +1378,24 @@ function filter(value, filterName) {
 	else {
 		updateBubbleVisibility("hidden", isChecked, filterName, value);
 	}	
+}
+
+/**
+ * Iterates through all the categories that have been unchecked and updates
+ * the filtered selection.
+ * 
+ * @param {Object} filterName the name of the filter based on its HTML "name" attribute
+ * @param {Object} filteringFunction filter function that will be used depending on the 
+ *                 kind of data that's being filtered (genre, rating, or distributor)
+ * @author Annette Almonte 
+ */
+function updateFilter(filterName, filteringFunction) {
+	var categories = document.getElementsByName(filterName);
+	for (var i = 0; i < categories.length; i++) {
+		if (document.getElementById(categories[i].value).checked == false) {
+			filteringFunction(categories[i].value);
+		}
+	}
 }
 
 /**
