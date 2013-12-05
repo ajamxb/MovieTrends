@@ -715,6 +715,8 @@ function generateBubbleGraph(){
 	// the DoD appearing for that circle in the DoD space will disappear		
 	d3.select("#bubbleRect")
 		.on("click", function(d) {
+			d3.select("#bubbleRect")
+				.attr("fill", "#FFFFFF");
 			if (movieDetailsOn) {
 				movieDetailsOn = false;          
 				d3.selectAll(".bubble")
@@ -733,7 +735,22 @@ function generateBubbleGraph(){
 					
 			}
 
-		});	
+		})
+		.on("mouseover", function(d) {
+			if (!isBubbleChartExpanded) {
+				d3.select("#bubbleRect")
+					.attr("fill", "#F2F9FA");				
+			}
+			
+		})
+		.on("mouseout", function(d) {
+			if (!isBubbleChartExpanded) {
+				d3.select("#bubbleRect")
+					.attr("fill", "#FFFFFF");				
+			}
+		});
+	//d3.select("#bubbleRect")
+	
 }
 
 /**
@@ -975,6 +992,8 @@ function generateLineGraph(){
 				.attr("height", lineChartHeight)
 				.attr("fill", "rgb(255, 255, 255)")
 				.on("click", function(d) {
+					d3.select("#lineGraphRect")
+						.attr("fill", "#FFFFFF");
 					if (lineSelected != null) {
 						lineSelected = null;          
 						unhighlightPoints();
@@ -991,7 +1010,20 @@ function generateLineGraph(){
 						updateBubbleGraph();						
 					}					
 
-				});
+				})
+				.on("mouseover", function(d) {
+					if (isBubbleChartExpanded) {
+						d3.select("#lineGraphRect")
+							.attr("fill", "#F2F9FA");				
+					}
+					
+				})
+				.on("mouseout", function(d) {
+					if (isBubbleChartExpanded) {
+						d3.select("#lineGraphRect")
+							.attr("fill", "#FFFFFF");				
+					}
+				});				
 	
 	// setup axis scales
 	var maxIncome = 6500000000;
