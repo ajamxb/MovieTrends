@@ -428,26 +428,27 @@ function displayDetails() {
         var xOffset = 20;
         
         // Represents the left, middle, and rightmost columns in the DOD space
-        var xPos = [xOffset, 160, 420, 620,820];
+        var xPos = [xOffset, 180, 410, 640,870];
+		var tPos=[410,640,870];
 		
         
         // Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
-        var yPos = [40, 80, 100];
+        var yPos = [50, 80, 95];
         
         var xAlign = ["start", "middle", "end"];
         
         var leftColText = [currRating, currGenre, currBudget, currIncome, currAdjustedIncome];
-        var rightColText = [rating,genre,budget,income,aincome];
+        var rightColText = [budget,income,aincome];
         
         for (var i = 0; i < xPos.length; i++) {
                 addText("leftColumn details", xPos[i], yPos[2], xAlign[0], leftColText[i]);        
         }
                         
         addText("middleColumn details title", detailsWidth/2, yPos[0], xAlign[1], currTitle);
-		addText("middleColumn details distributor", detailsWidth/2, 60,xAlign[1],currDistributor+"|"+currYear);
+		addText("middleColumn details distributor", detailsWidth/2, 70,xAlign[1],currDistributor+"|"+currYear);
      
-          for (var i = 0; i < xPos.length; i++) {
-               addText("rightColumn details", xPos[i]+5, 120, xAlign[0], rightColText[i]);        
+          for (var i = 0; i < yPos.length; i++) {
+               addText("rightColumn details", tPos[i], 115, xAlign[0], rightColText[i]);        
         }                                                                                                  
 }
 
@@ -811,7 +812,7 @@ function graphBubbles() {
 	d3.select(".bubbleChartSvg")
 		.selectAll("g")
 		.transition()
-		.duration(1000)
+		.duration(2000)
 		.attr("transform", function(d) {
 			return "translate("+ (-bubbleXScale(new Date(currYear, d.month - 1, d.day))) + "," 
 				                     + (-bubbleYScale(0)) + ") scale(2) translate(" + (0) + "," 
