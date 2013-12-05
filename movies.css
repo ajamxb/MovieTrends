@@ -35,13 +35,17 @@ filter {
 	font-family: Calibri, Arial;
 }
 .middleColumn.details.title{
-	font-size: 30px;
+	font-size: 27px;
 	font-weight: bold;
 }
 
 .leftColumn.details{
 	font-size: 20px;
 	font-weight: bold;
+}
+
+.rightColumn.details{
+	font-size:12px;
 }
 .legend {
 	font-size: 12px;
