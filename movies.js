@@ -16,8 +16,8 @@ var svgHeight = 800;
 var totalChartHeight = 300;
 var chartWidth = 1000;
 var dodChartHeight = 300;
-var lineChartHeight = 300; //250
-var bubbleChartHeight = 300; //350
+var lineChartHeight = 250;
+var bubbleChartHeight = 350;
 var detailsWidth = 1000;
 var detailsHeight = 150; //200;
 var filtersWidth = 200;
@@ -137,8 +137,8 @@ var lineSelected = null;
 // formats dollar amount with dollar sign and commas							        
 var incomeFormat = d3.format("$,f");
 
-// Keeps track of whether the bubble/line chart is expanded in height.
-var isGraphExpanded = false;
+// Keeps track of whether the bubble chart has expanded in height
+var isBubbleChartExpanded = true;
 	
 /*
  * We have referenced this code from https://gist.github.com/trtg/3922684
@@ -181,10 +181,13 @@ function setupLayout() {
 	bubbleSvg = svg.append("svg")
 						.attr("id", "bubbleChart")
 						.attr("x", "0")
-						.attr("y", (bubbleChartHeight + detailsHeight))
+						.attr("y", (bubbleChartHeight + detailsHeight -50))
 						.attr("width", chartWidth)
-						.attr("height", bubbleChartHeight)
+						.attr("height", bubbleChartHeight - 50)
 						.attr("overflow","visible");
+	
+	detailsSvg.attr("transform", "translate(0, -50)");
+	bubbleSvg.attr("transform", "translate(0, -50)");
 	
 	// create "tooltip" div and svg that will pop up next to mouse to display details-on-demand
 	tooltipDiv = d3.select("body")
@@ -415,8 +418,8 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
 }
 
 /**
- * Displays the data pertaining to a movie when a user
- * hovers over a bubble.
+ * Displays the data pertaining to a movie when a user clicks on a 
+ * bubble.
  * 
  * @author Annette Almonte 
  */
@@ -471,7 +474,7 @@ function displayPointDetails() {
 
 
 /*
- * Function used to add the text for the DoD.
+ * Function used to add the text for the DoD space.
  * @author Annette Almonte 
  */
 function addText(classAttr, x, y, textAnchor, text) {
@@ -664,7 +667,7 @@ function updateBubbleScalesAndAxes() {
 function generateBubbleGraph(){
 
 	bubbleSvg.append("rect")
-				.attr("class", "whitespace")
+				.attr("id", "bubbleRect")
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
@@ -710,7 +713,7 @@ function generateBubbleGraph(){
 	
 	// If you click anywhere in the bubble chart after a circle is selected
 	// the DoD appearing for that circle in the DoD space will disappear		
-	d3.select(".whitespace")
+	d3.select("#bubbleRect")
 		.on("click", function(d) {
 			if (movieDetailsOn) {
 				movieDetailsOn = false;          
@@ -718,10 +721,16 @@ function generateBubbleGraph(){
 				    .attr("opacity", 1.0);
 				clearMovieDetails();
 			}
-			if (!isGraphExpanded) {
-				isGraphExpanded = true;
-				bubbleChartHeight = 350;
+			if (!isBubbleChartExpanded) {
+				isBubbleChartExpanded = true;
+				bubbleChartHeight = 350;				
+				lineChartHeight = 250;
+				removeLineAndBarGraphs();
+				detailsSvg.attr("transform", "translate(0, -50)");
+				bubbleSvg.attr("transform", "translate(0, -50)");
+				generateLineGraph();
 				updateBubbleGraph();
+					
 			}
 
 		});	
@@ -959,6 +968,7 @@ function updateBubbleGraph() {
 function generateLineGraph(){
 	
 	lineSvg.append("rect")
+				.attr("id", "lineGraphRect")
 				.attr("x", "0")
 				.attr("y", "0")
 				.attr("width", chartWidth)
@@ -970,6 +980,17 @@ function generateLineGraph(){
 						unhighlightPoints();
 						unhighlightLines();
 					}
+					if (isBubbleChartExpanded) {
+						isBubbleChartExpanded = false;
+						bubbleChartHeight = 250;				
+						lineChartHeight = 350;
+						removeLineAndBarGraphs();
+						detailsSvg.attr("transform", "translate(0, 50)");
+						bubbleSvg.attr("transform", "translate(0, 50)");
+						generateLineGraph();
+						updateBubbleGraph();						
+					}					
+
 				});
 	
 	// setup axis scales
@@ -1220,6 +1241,23 @@ function generateLineGraph(){
 			.attr("y", 35)
 			.attr("text-anchor", "middle")
 			.text("U.S. Total Adjusted Domestic Income for Top 25 Movies per Year");
+}
+
+/**
+ * Removes the line graph and bar chart.
+ * 
+ * @author Annette Almonte
+ */
+function removeLineAndBarGraphs() {
+	d3.select("#lineChart")
+		.select("rect")
+		.remove();
+	d3.select("#lineChart")
+		.selectAll("g")
+		.remove();
+	d3.select("#lineChart")
+		.select("text")
+		.remove();	
 }
 
 /*
