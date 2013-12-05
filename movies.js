@@ -421,33 +421,36 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
  * Displays the data pertaining to a movie when a user clicks on a 
  * bubble.
  * 
- * @author Annette Almonte 
+ * @author Annette Almonte and Bharadwaj Tanikella
  */
 function displayDetails() {
-	
-	var xOffset = 20;
-	
-	// Represents the left, middle, and rightmost columns in the DOD space
-	var xPos = [xOffset, detailsWidth / 2, detailsWidth - xOffset];
-	
-	// Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
-	var yPos = [40, 80, 120]; 
-	
-	var xAlign = ["start", "middle", "end"];
-	
-	var leftColText = [currDistributor, currRating, currGenre];
-	var rightColText = [currBudget, currIncome, currAdjustedIncome];
-	
-	for (var i = 0; i < yPos.length; i++) {
-		addText("leftColumn details", xPos[0], yPos[i], xAlign[0], leftColText[i]);	
-	}
-        		
-	addText("middleColumn details title", xPos[1], yPos[1], xAlign[1], currTitle);
+        
+        var xOffset = 20;
+        
+        // Represents the left, middle, and rightmost columns in the DOD space
+        var xPos = [xOffset, 160, 420, 620,820];
+		
+        
+        // Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
+        var yPos = [40, 80, 100];
+        
+        var xAlign = ["start", "middle", "end"];
+        
+        var leftColText = [currRating, currGenre, currBudget, currIncome, currAdjustedIncome];
+        var rightColText = [rating,genre,budget,income,aincome];
+        
+        for (var i = 0; i < xPos.length; i++) {
+                addText("leftColumn details", xPos[i], yPos[2], xAlign[0], leftColText[i]);        
+        }
+                        
+        addText("middleColumn details title", detailsWidth/2, yPos[0], xAlign[1], currTitle);
+		addText("middleColumn details distributor", detailsWidth/2, 60,xAlign[1],currDistributor+"|"+currYear);
      
-   	for (var i = 0; i < yPos.length; i++) {
-		addText("rightColumn details", xPos[2], yPos[i], xAlign[2], rightColText[i]);	
-	}   	   	    	   		      	   	       	        	   	       	
+          for (var i = 0; i < xPos.length; i++) {
+               addText("rightColumn details", xPos[i]+5, 120, xAlign[0], rightColText[i]);        
+        }                                                                                                  
 }
+
 
 /*
  * Displays the data pertaining to a genre group when a user
@@ -880,17 +883,23 @@ function graphBubbles() {
 /**
  * Updates the DoD for the movie data in the DoD space.
  * 
- * @author Annette Almonte and Allison Chislett
+ * @author Annette Almonte and Allison Chislett and Bharadwaj Tanikella
  */
 function updateMovieDetails(d) {
-	currDistributor = "Distributor: " + d.distributor;
-	currRating = "Rating: " + d.rating;
-	currGenre = "Genre: " + d.genre;
-	currTitle = d.title;
-	currBudget = "Production Budget: " + d.formatted_production_budget;
-	currIncome = "Domestic Income: " + incomeFormat(d.domestic_income);
-	currAdjustedIncome = "Adjusted Income: " + incomeFormat(d.inflation_domestic_income);
-	displayDetails();	
+		
+        currDistributor = d.distributor;
+		rating="Movie Rating";
+		currRating =  d.rating;
+		genre="Genre(s)";
+		currGenre =  d.genre;
+        currTitle = d.title;
+		budget = "Production Budget" ;
+        currBudget =  d.formatted_production_budget;
+		income = "Domestic Income";
+        currIncome = incomeFormat(d.domestic_income);
+		aincome= "Adjusted Income";
+        currAdjustedIncome = incomeFormat(d.inflation_domestic_income);
+        displayDetails();        
 }
 
 /**
