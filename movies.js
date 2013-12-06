@@ -12,7 +12,7 @@ var files = new Array("1983-2012_movies.csv", "1983-2012_movies_totalincomes.csv
 
 // Dimensions for all the components in our vis
 var svgWidth = 1000;
-var svgHeight = 800;
+var svgHeight = 900;
 var totalChartHeight = 300;
 var chartWidth = 1000;
 var dodChartHeight = 300;
@@ -20,8 +20,8 @@ var lineChartHeight = 250;
 var bubbleChartHeight = 350;
 var detailsWidth = 1000;
 var detailsHeight = 150; //200;
-var filtersWidth = 200;
-var filtersHeight = 800;
+var filtersWidth = 160;
+var filtersHeight = 900;
 
 var hiddenCoordinate = -100;
 
