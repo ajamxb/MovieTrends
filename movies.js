@@ -453,31 +453,7 @@ function displayDetails() {
 }
 
 
-/*
- * Displays the data pertaining to a genre group when a user
- * hovers over a point on a line.
- */
-function displayPointDetails() {
-	
-	var xOffset = 20;
-	
-	// Represents the left, middle, and rightmost columns in the DOD space
-	var xPos = [xOffset, detailsWidth / 2, detailsWidth - xOffset];
-	
-	// Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
-	var yPos = [40, 80, 120];
-	
-	var xAlign = ["start", "middle", "end"];
-	
-	var middleColText = [year, currGenre, currIncome];
-	
-   	for (var i = 0; i < yPos.length; i++) {
-		addText("middleColumn details", xPos[1], yPos[i], xAlign[1], middleColText[i]);	
-	}	
-}
-
-
-/*
+/**
  * Function used to add the text for the DoD space.
  * @author Annette Almonte 
  */
@@ -490,7 +466,7 @@ function addText(classAttr, x, y, textAnchor, text) {
         	   	.text(text);  	
 }
 
-/*
+/**
  * Removes the data displayed in the DoD area.
  * @author Annette Almonte
  */
@@ -499,9 +475,10 @@ function removeDetails(className) {
 }
 
 		
-/*
+/**
  * display pop-up details next to mouse
  * when hovering over a bubble
+ * 
  * @author Allison Chislett
  */
 function displayBubbleTooltipDetails(d) {
@@ -537,6 +514,7 @@ function displayBubbleTooltipDetails(d) {
 /**
  * display pop-up details next to mouse
  * when hovering over a bar
+ * 
  * @author Allison Chislett
  */
 function displayBarTooltipDetails(d) {
@@ -577,6 +555,7 @@ function displayBarTooltipDetails(d) {
 /**
  * display pop-up details next to mouse
  * when hovering over a data point on a genre line
+ * 
  * @author Allison Chislett
  */
 function displayLineTooltipDetails(d, genreName) {
@@ -611,6 +590,7 @@ function displayLineTooltipDetails(d, genreName) {
 
 /**
  * remove pop-up details
+ * 
  * @author Allison Chislett
  */
 function removeTooltipDetails() {
@@ -665,8 +645,10 @@ function updateBubbleScalesAndAxes() {
 }
 
 
-/*
- * Generates the bubble chart. 
+/**
+ * Generates the bubble chart.
+ * 
+ * @author Annette Almonte 
  */
 function generateBubbleGraph(){
 
@@ -933,9 +915,11 @@ function determineCurrentLabel() {
 	return "Income (millions USD)";
 }
 
-/*
+/**
  * Determines the label for the y-axes based on what mode (adjusted income or
  * actual domestic income) the user is in.
+ * 
+ * @author Annette Almonte
  */
 function determineCurrentBarYLabel() {
 	if (indexCurrYValue == 0) {
@@ -988,8 +972,9 @@ function updateBubbleGraph() {
 		
 }
 
-/*
+/**
  * generates the line graph to display genre data
+ * 
  * @author Allison Chislett
  */
 function generateLineGraph(){
@@ -1302,13 +1287,14 @@ function removeLineAndBarGraphs() {
 		.remove();	
 }
 
-/*
+/**
  * "Selects" the line that was clicked.
  * Highlights the line (even when mouse moves away)
  * and highlights all the points on that line.
  * 
- * @param o
- * @param genreName
+ * @param o the path group object that was clicked
+ * @param genreName the genre group name of the path/line that was clicked
+ * @author Allison Chislett
  */
 function selectLine(o, genreName) {	
 	lineSelected = o;
@@ -1318,10 +1304,11 @@ function selectLine(o, genreName) {
 		.each( function(d) { highlightPoint(this); });
 }
 
-/*
+/**
  * Highlights the line that's being hovered over.
  * 
  * @param o the path group object that is being hovered over
+ * @author Allison Chislett
  */
 function highlightLine(o) {
 	d3.selectAll(".line")
@@ -1338,9 +1325,11 @@ function highlightLine(o) {
 	d3.select(o).moveToFront();			
 }
 
-/*
+/**
  * Returns all of the lines to their normal state when
  * the user is not hovering over any of them.
+ * 
+ * @author Allison Chislett
  */
 function unhighlightLines() {
 	d3.selectAll(".line")
@@ -1351,10 +1340,11 @@ function unhighlightLines() {
 	    
 }
 
-/*
+/**
  * Highlights the point that's being hovered over.
  * 
  * @param o the circle object that is being hovered over
+ * @author Allison Chislett
  */
 function highlightPoint(o) {
 	d3.select(o)
@@ -1364,10 +1354,11 @@ function highlightPoint(o) {
 
 }
 
-/*
+/**
  * Returns the point to its normal state when
  * the user is not hovering over it.
  * 
+ * @author Allison Chislett
  */
 function unhighlightPoints() {
 	d3.selectAll(".point")
