@@ -71,20 +71,11 @@
 
 
 /* CSS for the filters. */
-ul {
-	font-family: Arial;
+#filter ul {
+	font-family: Calibri;
 	font-size: 12px;
-}
-
-ul {
 	text-decoration: none;
 	list-style: none;
-	font-family: Calibri;
-}
-
-filter {
-	font-family: Calibri;
-
 }
 
 div#filter {
@@ -98,4 +89,13 @@ div#filter {
 	padding-top: 20px;
 	padding-bottom: 20px;
 	margin-right: 20px;
+}
+
+
+/* CSS for the modal. */
+.modal-body ul {
+	font-family: Calibri;
+	font-size: 16px;
+	text-decoration: none;
+	list-style: none;
 }
