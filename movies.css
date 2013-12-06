@@ -89,6 +89,7 @@ filter {
 
 div#filter {
 	background: rgb(242,242,242);
+	display:inline-block;
 	padding-left: 20px;
 	padding-right: 20px; 
 	padding-top: 20px;
