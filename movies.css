@@ -4,17 +4,7 @@
  */
 
 
-ul {
-	text-decoration: none;
-	list-style: none;
-	font-family: Calibri;
-}
-
-filter {
-	font-family: Calibri;
-
-}
-
+/* CSS for graph axes and labels. */
 .axis path, 
 .axis line {
     fill: none;
@@ -27,9 +17,19 @@ filter {
     font-size: 12px;
 }
 
+.graphTitle {
+	font-family: sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: black;  
+}
+
+
+/* CSS for details on demand section. */
 #details text {
 	font-family: Calibri, Arial;
 }
+
 .middleColumn.details.title{
 	font-size: 27px;
 	font-weight: bold;
@@ -43,18 +43,13 @@ filter {
 .rightColumn.details{
 	font-size:12px;
 }
+
 .legend {
 	font-size: 12px;
 }
 
-.graphTitle {
-	font-family: sans-serif;
-	font-size: 16px;
-	font-weight: bold;
-	color: black;  
-}
 
-
+/* CSS for tooltips. */
 #tooltipSvg {
 	border: 1px solid;
 	border-color: #000000;
@@ -65,6 +60,7 @@ filter {
 	font-size: 12px;
 	font-family: Calibri;
 }
+
 .tooltipText {
 	
 }
@@ -73,8 +69,28 @@ filter {
 	font-weight: bold;
 }
 
+
 /* CSS for the filters. */
 ul {
 	font-family: Arial;
 	font-size: 12px;
+}
+
+ul {
+	text-decoration: none;
+	list-style: none;
+	font-family: Calibri;
+}
+
+filter {
+	font-family: Calibri;
+
+}
+
+div#filter {
+	background: rgb(242,242,242);
+	display:block; 
+	padding-left: 20px; 
+	padding-top: 20px; 
+	margin-right: 20px;
 }
