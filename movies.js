@@ -1009,8 +1009,14 @@ function generateLineGraph(){
 						bubbleSvg.attr("transform", "translate(0, 50)");
 						generateLineGraph();
 						updateBubbleGraph();						
-					}					
-
+					}
+										
+					if (movieDetailsOn) {
+						movieDetailsOn = false;          
+						d3.selectAll(".bubble")
+						    .attr("opacity", 1.0);
+						clearMovieDetails();
+					}
 				})
 				.on("mouseover", function(d) {
 					if (isBubbleChartExpanded) {
