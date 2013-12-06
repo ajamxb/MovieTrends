@@ -54,8 +54,8 @@ var genreNames = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Docume
 				  "Fantasy", "Horror", "Musical", "Romance", "Sci-Fi", "Thriller", "War", 
 				  "Western"];
              
-var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#FAAC3E", "#BFE3E1", "#89739E", "#DE76A1",
-                   "#454269", "#D8C0EB", "#FAC8E8", "#7CB360", "#BFBFBF", "#9E5D5D", "#E8C387"];
+var genreColors = ["#D63E3F", "#C1E090", "#65B5F7", "#F5EA58", "#FAAC3E", "#7CB360", "#89739E", "#DE76A1",
+                   "#454269", "#D8C0EB", "#FAC8E8", "#BFE3E1", "#BFBFBF", "#9E5D5D", "#E8C387"];
                    
 //var genreList = [""]
 var currYear = years[years.length-1];
@@ -109,14 +109,14 @@ var smallTitleSize = 18;
 var genreGroupNames = ["Action, Adventure, Thriller, Crime, Western", "Animation", "Horror, Fantasy, Sci-Fi", 
 					   "Comedy, Musical", "Drama, Romance, War", "Documentary"];
 					   
-var genreGroupColors = ["#D63E3F", "#65B5F7", "#454269", "#F5EA58", "#89739E", "#BFE3E1"];
+var genreGroupColors = ["#D63E3F", "#65B5F7", "#454269", "#F5EA58", "#89739E", "#7CB360"];
 
 var genreColorKeyValue = {"Action, Adventure, Thriller, Crime, Western": "#D63E3F",
 					  "Animation": "#65B5F7",
 					  "Horror, Fantasy, Sci-Fi": "#454269",
 					  "Comedy, Musical": "#F5EA58",
 					  "Drama, Romance, War": "#89739E",
-					  "Documentary": "#BFE3E1"};
+					  "Documentary": "#7CB360"};
 					  
 var distributor = ["Buena Vista", "DreamWorks", "Fox", "Paramount Pictures", "Sony Pictures",
 					"Universal", "Warner Bros.", "Other"];					 
