@@ -431,11 +431,11 @@ function displayLineSwatch(index, x1, y1, x2, y2, stroke) {
  */
 function displayDetails() {
         
-        var xOffset = 20;
+        var xOffset = 55;
         
         // Represents the left, middle, and rightmost columns in the DOD space
-        var xPos = [xOffset, 180, 410, 640,870];
-		var tPos=[420,650,880];
+        var xPos = [xOffset, 230, 450, 680,910];
+		var tPos=[450,680,910];
 		
         
         // Represent the top, middle, and bottom y-coordinates for the rows of the DOD space
@@ -447,14 +447,14 @@ function displayDetails() {
         var rightColText = [budget,income,aincome];
         
         for (var i = 0; i < xPos.length; i++) {
-                addText("leftColumn details", xPos[i], yPos[2], xAlign[0], leftColText[i]);        
+                addText("leftColumn details", xPos[i], yPos[2], xAlign[1], leftColText[i]);        
         }
                         
         addText("middleColumn details title", detailsWidth/2, yPos[0], xAlign[1], currTitle);
 		addText("middleColumn details distributor", detailsWidth/2, 65,xAlign[1],currDistributor+"|"+currYear);
      
           for (var i = 0; i < yPos.length; i++) {
-               addText("rightColumn details", tPos[i], 115, xAlign[0], rightColText[i]);        
+               addText("rightColumn details", tPos[i], 115, xAlign[1], rightColText[i]);        
         }                                                                                                  
 }
 
