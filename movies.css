@@ -1,12 +1,8 @@
 /** 
  * 	CSS for the Movie Trends vis goes here. 
- *  Please delete this comment later :).
+ * 
  */
 
-svg{
-	border: 2px solid;
-	border-color: #d3d3d3;
-}
 
 ul {
 	text-decoration: none;
