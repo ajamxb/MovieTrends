@@ -1094,6 +1094,13 @@ function generateLineGraph(){
 							lineSelected = null;
 				      		unhighlightLines();
 				      		unhighlightPoints();
+				      		
+				      		if (movieDetailsOn) {
+								movieDetailsOn = false;          
+								d3.selectAll(".bubble")
+								    .attr("opacity", 1.0);
+								clearMovieDetails();
+							}
 						})
 						.on("mouseover", function(d) {
 							d3.select(this)
@@ -1203,6 +1210,12 @@ function generateLineGraph(){
 	      		unhighlightLines();
 	      		unhighlightPoints();
 	      	}
+	      	if (movieDetailsOn) {
+				movieDetailsOn = false;          
+				d3.selectAll(".bubble")
+				    .attr("opacity", 1.0);
+				clearMovieDetails();
+			}
 	      })
 	      .style("stroke", function(d) { 
 	      	return genreColorKeyValue[d.name]; 
@@ -1260,6 +1273,12 @@ function generateLineGraph(){
 						lineSelected = null;
 						unhighlightPoints();
 						unhighlightLines();
+					}
+					if (movieDetailsOn) {
+						movieDetailsOn = false;          
+						d3.selectAll(".bubble")
+						    .attr("opacity", 1.0);
+						clearMovieDetails();
 					}
 				})
  				.attr("opacity", 0.0)
