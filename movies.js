@@ -202,6 +202,12 @@ function setupLayout() {
 			.attr("width", tooltipWidth)
 			.attr("overflow","visible")
 			.style("opacity",0);
+			
+			
+	// set height of filter div to match svg height
+	d3.select("#filter")
+		.attr("height",filtersHeight)
+		.attr("width",filtersWidth);
 }
 
 loadData(files[0]);
