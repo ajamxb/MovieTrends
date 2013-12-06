@@ -811,7 +811,7 @@ function graphBubbles() {
 				.on("mouseover", function(d) { 
 					if (!movieDetailsOn) {
 						d3.selectAll(".bubble")
-			                    .attr("opacity", 0.5);
+			                    .attr("opacity", 0.3);
 			            d3.select(this).moveToFront()
 			                	.attr("opacity", 1.0);
 			            displayBubbleTooltipDetails(d);					
@@ -839,7 +839,7 @@ function graphBubbles() {
 	            	movieDetailsOn = true;
 	
 		            d3.selectAll(".bubble")
-		            	.attr("opacity", 0.5);
+		            	.attr("opacity", 0.3);
 		            d3.select(this).moveToFront()
 		                .attr("opacity", 1.0);
 		            updateMovieDetails(d);
