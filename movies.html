@@ -6,117 +6,148 @@
     <link rel="stylesheet" type="text/css" href="movies.css">
     <script src="d3.v3.min.js" charset="utf-8"></script>
     <script src="jquery.js" charset="utf-8"></script>
+	<link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" />
+  <link href="http://getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.css" rel="stylesheet" />
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://getbootstrap.com/2.3.2/assets/js/google-code-prettify/prettify.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap.js"></script>
+    <script src="js/bootstrap-modalmanager.js"></script>
+    <script src="js/bootstrap-modal.js"></script>
+  <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet" />
+  <link href="css/bootstrap-modal.css" rel="stylesheet" />
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#myModal').modal('show');
+		});
+	</script>
     <script type="text/javascript" src="movies.js"></script>
-	
-	
+        
+        
 </head>
 
 <body>
-	<span id="measureText" hidden="true" style="font-size: 12px;font-family: Calibri"></span>
-	
-	<div id="data" style="float: left">
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Movie Trends</h4>
+      </div>
+      <div class="modal-body">
+        This visualization allows you to explore the financial trends of the top 25 movies over 30 years.
+		<br>
+		Data was collected from <a href="http://opusdata.com/">Opus Data </a> <a href="http://boxofficemojo.com/">BoxOffice Mojo</a> and <a href="http://www.imdb.com/">IMDB</a> 
+      </div>
+      <div class="modal-footer">
+		By: Annette, Allison, Bharadwaj & Morgan
+        <button type="button" class="btn btn-success" data-dismiss="modal">Continue</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+        <span id="measureText" hidden="true" style="font-size: 12px;font-family: Calibri"></span>
+        
+        <div id="data" style="float: left">
 
     </div>
     <div id="filter">
-		<ul>
-		<li style="font-weight: bold">Genre</li>
-		<li><input class="filter" type="checkbox" id="Action"  value="Action"
+                <ul>
+                <li style="font-weight: bold">Genre</li>
+                <li><input class="filter" type="checkbox" id="Action" value="Action"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Action</li>
-		<li><input class="filter" type="checkbox" id="Adventure"  value="Adventure"
+                <li><input class="filter" type="checkbox" id="Adventure" value="Adventure"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Adventure</li>
-		<li><input class="filter" type="checkbox" id="Animation"  value="Animation"
+                <li><input class="filter" type="checkbox" id="Animation" value="Animation"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Animation</li>
-		<li><input class="filter" type="checkbox" id="Comedy"  value="Comedy"
+                <li><input class="filter" type="checkbox" id="Comedy" value="Comedy"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Comedy</li>
-		<li><input class="filter" type="checkbox" id="Crime"  value="Crime"
+                <li><input class="filter" type="checkbox" id="Crime" value="Crime"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Crime</li>
-		<li><input class="filter" type="checkbox" id="Documentary"  value="Documentary"
+                <li><input class="filter" type="checkbox" id="Documentary" value="Documentary"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Documentary</li>
-		<li><input class="filter" type="checkbox" id="Drama"  value="Drama"
+                <li><input class="filter" type="checkbox" id="Drama" value="Drama"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Drama</li>
-		<li><input class="filter" type="checkbox" id="Fantasy"  value="Fantasy"
+                <li><input class="filter" type="checkbox" id="Fantasy" value="Fantasy"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Fantasy</li>
-		<li><input class="filter" type="checkbox" id="Horror"  value="Horror"
+                <li><input class="filter" type="checkbox" id="Horror" value="Horror"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Horror</li>
-		<li><input class="filter" type="checkbox" id="Musical"  value="Musical"
+                <li><input class="filter" type="checkbox" id="Musical" value="Musical"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Musical</li>
-		<li><input class="filter" type="checkbox" id="Romance"  value="Romance"
+                <li><input class="filter" type="checkbox" id="Romance" value="Romance"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Romance</li>
-		<li><input class="filter" type="checkbox" id="Sci-Fi"  value="Sci-Fi"
+                <li><input class="filter" type="checkbox" id="Sci-Fi" value="Sci-Fi"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Sci-Fi</li>
-		<li><input class="filter" type="checkbox" id="Thriller"  value="Thriller"
+                <li><input class="filter" type="checkbox" id="Thriller" value="Thriller"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Thriller</li>
-		<li><input class="filter" type="checkbox" id="War"  value="War"
+                <li><input class="filter" type="checkbox" id="War" value="War"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              War</li>
-		<li><input class="filter" type="checkbox" id="Western"  value="Western"
+                <li><input class="filter" type="checkbox" id="Western" value="Western"
              name="genreFilter" onclick="selectGenre(this.value);" checked>
              Western</li>
-			 
-		</ul>
-		
-		<ul>
-		<li style="font-weight: bold">Rating</li>
-		<li><input class="filter" type="checkbox" id="G" value="G"
+                        
+                </ul>
+                
+                <ul>
+                <li style="font-weight: bold">Rating</li>
+                <li><input class="filter" type="checkbox" id="G" value="G"
              name="ratingFilter" onclick="selectRating(this.value);" checked>
              G</li>
-		<li><input class="filter" type="checkbox" id="PG" value="PG"
+                <li><input class="filter" type="checkbox" id="PG" value="PG"
              name="ratingFilter" onclick="selectRating(this.value);" checked>
              PG</li>
-		<li><input class="filter" type="checkbox" id="PG-13" value="PG-13"
+                <li><input class="filter" type="checkbox" id="PG-13" value="PG-13"
              name="ratingFilter" onclick="selectRating(this.value);" checked>
              PG-13</li>
-		<li><input class="filter" type="checkbox" id="R" value="R"
+                <li><input class="filter" type="checkbox" id="R" value="R"
              name="ratingFilter" onclick="selectRating(this.value);" checked>
              R</li>
-		</ul>
-		
-		<ul>
-		<li style="font-weight: bold">Distributor</li>
-		<li><input class="filter" type="checkbox" id="Buena Vista" value="Buena Vista"
-			 name="distributorFilter" onclick="selectDistributor(this.value);" checked>
+                </ul>
+                
+                <ul>
+                <li style="font-weight: bold">Distributor</li>
+                <li><input class="filter" type="checkbox" id="Buena Vista" value="Buena Vista"
+                         name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Buena Vista</li>
-		<li><input class="filter" type="checkbox" id="DreamWorks" value="DreamWorks"
+                <li><input class="filter" type="checkbox" id="DreamWorks" value="DreamWorks"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              DreamWorks</li>
-		<li><input class="filter" type="checkbox" id="Fox" value="Fox"
+                <li><input class="filter" type="checkbox" id="Fox" value="Fox"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Fox</li>
-		<li><input class="filter" type="checkbox" id="Paramount Pictures" value="Paramount Pictures"
+                <li><input class="filter" type="checkbox" id="Paramount Pictures" value="Paramount Pictures"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Paramount Pictures</li>
-		<li><input class="filter" type="checkbox" id="Sony Pictures" value="Sony Pictures"
+                <li><input class="filter" type="checkbox" id="Sony Pictures" value="Sony Pictures"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Sony Pictures</li>
-		<li><input class="filter" type="checkbox" id="Universal" value="Universal"
+                <li><input class="filter" type="checkbox" id="Universal" value="Universal"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Universal</li>
-		<li><input class="filter" type="checkbox" id="Warner Bros." value="Warner Bros."
+                <li><input class="filter" type="checkbox" id="Warner Bros." value="Warner Bros."
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Warner Bros.</li>
-		<li><input class="filter" type="checkbox" id="Other" value="Other"
+                <li><input class="filter" type="checkbox" id="Other" value="Other"
              name="distributorFilter" onclick="selectDistributor(this.value);" checked>
              Other</li>
-		</ul>
-		
-		<ul>
-		<li><input class="filter" type="checkbox" id="Select All" value="Select All"
-			name="selectAll" onclick="selectAll(this.value);" checked>
-			Select All</li>
-		</ul>
+                </ul>
+                
+                <ul>
+                <li><input class="filter" type="checkbox" id="Select All" value="Select All"
+                        name="selectAll" onclick="selectAll(this.value);" checked>
+                        Select All</li>
+                </ul>
     </div>
 </body>
-</html>
